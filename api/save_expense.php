@@ -75,7 +75,7 @@ $categoryBudget = (float) ($catBudgetStmt->fetchColumn() ?: 0);
 
 if ($categoryBudget > 0 && ($categorySpentSoFar + $amount) > $categoryBudget) {
     $left = max($categoryBudget - $categorySpentSoFar, 0);
-    echo json_encode(['success' => false, 'message' => "This would go over your {$category} budget \u{2014} only " . peso_format_currency($left) . ' left for this period.']);
+    echo json_encode(['success' => false, 'message' => "This would go over your {$category} budget \u{2014} only ₱" . number_format($left, 2) . ' left for this period.']);
     exit;
 }
 
@@ -94,7 +94,7 @@ $overallBudget = (float) ($overallBudgetStmt->fetchColumn() ?: 0);
 
 if ($overallBudget > 0 && ($totalSpentSoFar + $amount) > $overallBudget) {
     $left = max($overallBudget - $totalSpentSoFar, 0);
-    echo json_encode(['success' => false, 'message' => 'This would go over your overall ' . strtolower(peso_period_type_label($periodType)) . " budget \u{2014} only " . peso_format_currency($left) . ' left for this period.']);
+    echo json_encode(['success' => false, 'message' => 'This would go over your overall ' . strtolower(peso_period_type_label($periodType)) . " budget \u{2014} only ₱" . number_format($left, 2) . ' left for this period.']);
     exit;
 }
 

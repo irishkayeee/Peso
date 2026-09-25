@@ -73,7 +73,7 @@ if (!isset($monthOptions[$selectedMonth])) {
 }
 krsort($monthOptions);
 
-// ---- Category breakdown (this month; drives Budget Alert / biggest-mover insight) ----
+// ---- Category breakdown (selected month; drives the biggest-mover insight) ----
 $stmt = $pdo->prepare(
     'SELECT category, SUM(amount) AS total FROM expenses
      WHERE user_id = ? AND expense_date BETWEEN ? AND ?
@@ -147,6 +147,11 @@ if ($periodBudget > 0) {
     $periodSavingsPct = 0;
 }
 $noCurrentSpendingYet = $savingsMode === 'compare' && $chartTotal <= 0 && $chartPrevTotal > 0;
+// Nothing logged yet isn't real savings - don't show last period's whole total as "saved".
+if ($noCurrentSpendingYet) {
+    $periodSavings = 0;
+    $periodSavingsPct = 0;
+}
 
 $rangeBudgetLabel = peso_period_type_label($range) . ' Budget';
 $rangeCompareLabel = ['day' => 'vs. yesterday', 'week' => 'vs. last week', 'month' => 'vs. last month'][$range];
@@ -334,15 +339,28 @@ if (empty($keyInsights)) {
     ];
 }
 
-// ---- Budget alert: category with highest utilization vs its own budget ----
+// ---- Budget alert: category with highest utilization vs its own budget.
+// Always the current calendar month, regardless of the Day/Week/Month
+// toggle or month picker (FR-18). ----
+$currentMonthStart = date('Y-m-01');
+$currentMonthEnd = date('Y-m-t');
+
+$stmt = $pdo->prepare(
+    'SELECT category, SUM(amount) AS total FROM expenses
+     WHERE user_id = ? AND expense_date BETWEEN ? AND ?
+     GROUP BY category'
+);
+$stmt->execute([$userId, $currentMonthStart, $currentMonthEnd]);
+$currentMonthBreakdown = $stmt->fetchAll();
+
 $stmt = $pdo->prepare("SELECT category, amount FROM budgets WHERE user_id = ? AND category != '' AND period_type = 'month' AND period_start = ?");
-$stmt->execute([$userId, $monthStart]);
+$stmt->execute([$userId, $currentMonthStart]);
 $categoryBudgets = $stmt->fetchAll();
 
 $budgetAlert = null;
 foreach ($categoryBudgets as $cb) {
     $spent = 0;
-    foreach ($categoryBreakdown as $c) {
+    foreach ($currentMonthBreakdown as $c) {
         if ($c['category'] === $cb['category']) {
             $spent = (float) $c['total'];
             break;

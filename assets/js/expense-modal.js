@@ -49,7 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return 'Your ' + category + ' budget is already used up for this period (' + pesoFmt(Math.max(catData.budget - catSpent, 0)) + ' left). Raise the budget or remove an expense before adding more.';
     }
     if (overallData.budget > 0 && overallSpent >= overallData.budget) {
-      return 'Your overall ' + periodType + ' budget is already used up for this period (' + pesoFmt(Math.max(overallData.budget - overallSpent, 0)) + ' left). Raise the budget or remove an expense before adding more.';
+      var periodLabel = { day: 'daily', week: 'weekly', month: 'monthly' }[periodType] || periodType;
+      return 'Your overall ' + periodLabel + ' budget is already used up for this period (' + pesoFmt(Math.max(overallData.budget - overallSpent, 0)) + ' left). Raise the budget or remove an expense before adding more.';
     }
     return null;
   }
