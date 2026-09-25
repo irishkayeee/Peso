@@ -1,0 +1,428 @@
+/* =========================================================
+   PESO — Auth Pages (Login / Sign Up)
+   Shares palette & motifs from style.css
+   ========================================================= */
+
+body.auth-body {
+  min-height: 100vh;
+  background-color: var(--warm-cream);
+  display: flex;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.auth-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+}
+
+/* ---------- Left brand panel ---------- */
+.auth-brand-panel {
+  position: relative;
+  flex: 0 0 42%;
+  max-width: 42%;
+  background: linear-gradient(160deg, var(--forest-green) 0%, var(--forest-green-dark) 100%);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 3.2rem;
+  overflow: hidden;
+}
+
+.auth-brand-panel .blob-decor {
+  z-index: 0;
+}
+
+.auth-brand-panel .logo-img-wrap {
+  height: 56px;
+  background-color: rgba(255, 255, 255, 0.92);
+  border-radius: 14px;
+  padding: 0.4rem 0.7rem;
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 2.2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.auth-brand-panel .logo-img {
+  height: 100%;
+  width: auto;
+}
+
+.auth-brand-content {
+  position: relative;
+  z-index: 2;
+}
+
+.auth-brand-content h2 {
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+
+.auth-brand-content .script-font {
+  color: var(--soft-gold);
+  font-size: 1.15em;
+  font-weight: 500;
+}
+
+.auth-brand-content p {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1.02rem;
+  max-width: 380px;
+  margin-bottom: 2.2rem;
+}
+
+.auth-brand-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.auth-brand-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 1.1rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.auth-brand-list i {
+  color: var(--soft-gold);
+  font-size: 1.15rem;
+  margin-top: 0.1rem;
+}
+
+.auth-brand-panel .coin-stack {
+  right: 8%;
+  left: auto;
+  bottom: auto;
+  top: 8%;
+  opacity: 0.5;
+}
+
+/* ---------- Right form panel ---------- */
+.auth-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  background-color: var(--warm-cream);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--white);
+  border-radius: 20px;
+  padding: 2rem 1.8rem;
+  box-shadow: 0 10px 34px rgba(36, 92, 74, 0.1);
+  border: 1px solid rgba(127, 175, 155, 0.25);
+}
+
+.auth-mobile-logo {
+  display: none;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-mobile-logo .logo-img {
+  height: 48px;
+}
+
+.auth-card h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  margin-bottom: 0.3rem;
+}
+
+.auth-card .auth-subtitle {
+  color: var(--charcoal);
+  opacity: 0.7;
+  font-size: 0.85rem;
+  margin-bottom: 1.4rem;
+}
+
+.auth-form .form-label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--charcoal);
+  margin-bottom: 0.4rem;
+}
+
+.auth-form .input-group-text {
+  background-color: #FBF9F3;
+  border: 1.5px solid rgba(127, 175, 155, 0.4);
+  border-right: none;
+  color: var(--forest-green);
+}
+
+.auth-form .form-control {
+  background-color: #FBF9F3;
+  border: 1.5px solid rgba(127, 175, 155, 0.4);
+  border-left: none;
+  padding: 0.65rem 0.9rem 0.65rem 0;
+  font-size: 0.95rem;
+}
+
+.auth-form .form-control:focus {
+  box-shadow: none;
+  border-color: var(--forest-green);
+  background-color: var(--white);
+}
+
+.auth-form .input-group:focus-within .input-group-text {
+  border-color: var(--forest-green);
+  background-color: var(--white);
+}
+
+.auth-form .toggle-password {
+  background-color: #FBF9F3;
+  border: 1.5px solid rgba(127, 175, 155, 0.4);
+  border-left: none;
+  color: var(--charcoal);
+  opacity: 0.6;
+}
+
+.auth-form .input-group:focus-within .toggle-password {
+  border-color: var(--forest-green);
+  background-color: var(--white);
+}
+
+.auth-form .form-check-label {
+  font-size: 0.88rem;
+  color: var(--charcoal);
+  opacity: 0.85;
+}
+
+.auth-form .form-check-input:checked {
+  background-color: var(--forest-green);
+  border-color: var(--forest-green);
+}
+
+.auth-forgot-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--forest-green);
+}
+
+.auth-forgot-link:hover {
+  color: var(--forest-green-dark);
+  text-decoration: underline;
+}
+
+.btn-forest-block {
+  width: 100%;
+  background-color: var(--forest-green);
+  color: var(--white);
+  border: 1.5px solid var(--forest-green);
+  border-radius: 50px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.btn-forest-block:hover {
+  background-color: var(--forest-green-dark);
+  color: var(--white);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 1.6rem 0;
+  color: var(--charcoal);
+  opacity: 0.5;
+  font-size: 0.82rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: rgba(36, 92, 74, 0.2);
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--charcoal);
+  opacity: 0.85;
+}
+
+.auth-switch a {
+  color: var(--forest-green);
+  font-weight: 700;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.auth-alert {
+  border-radius: 12px;
+  font-size: 0.88rem;
+  border: none;
+  padding: 0.8rem 1rem;
+}
+
+.auth-alert-danger {
+  background-color: rgba(217, 108, 108, 0.12);
+  color: #a83e3e;
+}
+
+.auth-alert-success {
+  background-color: rgba(127, 175, 155, 0.2);
+  color: var(--forest-green-dark);
+}
+
+.password-strength {
+  height: 4px;
+  border-radius: 3px;
+  background-color: rgba(36, 92, 74, 0.1);
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 3px;
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+/* ---------- Forgot password: OTP input ---------- */
+.otp-input-group {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.otp-digit {
+  width: 46px;
+  height: 54px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  background-color: #FBF9F3;
+  border: 1.5px solid rgba(127, 175, 155, 0.4);
+  border-radius: 10px;
+}
+
+.otp-digit:focus {
+  outline: none;
+  border-color: var(--forest-green);
+  background-color: var(--white);
+}
+
+.fp-timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--charcoal);
+  opacity: 0.85;
+}
+
+#fpTimer.expired {
+  color: var(--muted-red);
+  opacity: 1;
+  font-weight: 600;
+}
+
+.fp-resend-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fp-resend-btn:not(:disabled) {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.fp-resend-btn:not(:disabled):hover {
+  text-decoration: underline;
+}
+
+/* ---------- Auth modal (login/signup over the landing page) ---------- */
+.auth-modal .modal-dialog {
+  max-width: 440px;
+}
+
+.auth-modal-content {
+  position: relative;
+  border: 1px solid rgba(127, 175, 155, 0.25);
+  border-radius: 20px;
+  padding: 2.6rem 2.4rem;
+  background-color: var(--white);
+  box-shadow: 0 20px 50px rgba(36, 92, 74, 0.2);
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 1.3rem;
+  right: 1.3rem;
+  z-index: 2;
+}
+
+.auth-modal .modal-body {
+  padding: 0;
+}
+
+.auth-modal .auth-mobile-logo {
+  display: flex;
+  justify-content: center;
+}
+
+.auth-modal .auth-mobile-logo .logo-img {
+  height: 44px;
+}
+
+@media (max-width: 575.98px) {
+  .auth-modal-content {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 991.98px) {
+  .auth-brand-panel {
+    display: none;
+  }
+  .auth-form-panel {
+    flex: 1;
+    max-width: 100%;
+  }
+  .auth-mobile-logo {
+    display: flex;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .auth-card {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+}
