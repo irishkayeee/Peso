@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `profile_picture` VARCHAR(255) NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `notify_budget_alerts` TINYINT(1) NOT NULL DEFAULT 1,
+  `has_seen_tour` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 25, 2026 at 06:37 AM
+-- Generation Time: Sep 30, 2026 at 12:51 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,7 +48,11 @@ INSERT INTO `budgets` (`id`, `user_id`, `category`, `period_type`, `period_start
 (7, 4, 'Shopping', 'month', '2026-09-01', '2026-09-30', 500.00, '2026-09-14 09:39:50'),
 (12, 4, '', 'week', '2026-09-14', '2026-09-20', 100.00, '2026-09-14 12:48:22'),
 (26, 4, '', 'day', '2026-09-16', '2026-09-16', 1000.00, '2026-09-16 13:21:54'),
-(27, 4, 'Food', 'day', '2026-09-16', '2026-09-16', 1000.00, '2026-09-16 13:22:04');
+(27, 4, 'Food', 'day', '2026-09-16', '2026-09-16', 1000.00, '2026-09-16 13:22:04'),
+(36, 4, '', 'day', '2026-09-28', '2026-09-28', 6000.00, '2026-09-28 11:39:28'),
+(37, 4, 'Food', 'day', '2026-09-28', '2026-09-28', 4000.00, '2026-09-28 11:40:12'),
+(39, 4, 'Transportation', 'day', '2026-09-28', '2026-09-28', 1000.00, '2026-09-28 11:40:53'),
+(41, 4, 'Education', 'day', '2026-09-28', '2026-09-28', 1000.00, '2026-09-28 12:15:32');
 
 -- --------------------------------------------------------
 
@@ -78,7 +82,8 @@ INSERT INTO `expenses` (`id`, `user_id`, `amount`, `category`, `payment_method`,
 (51, 4, 300.00, 'Food', 'Cash', 'jabe', '2026-09-16', 'month', '2026-09-16 13:28:49'),
 (52, 4, 200.00, 'Food', 'Cash', '', '2026-09-16', 'month', '2026-09-16 13:41:54'),
 (53, 4, 300.00, 'Food', 'Cash', '', '2026-09-16', 'month', '2026-09-16 13:42:15'),
-(603, 4, 300.00, 'Food', 'Cash', '', '2026-09-17', 'month', '2026-09-17 08:41:14');
+(603, 4, 300.00, 'Food', 'Cash', '', '2026-09-17', 'month', '2026-09-17 08:41:14'),
+(606, 4, 1000.00, 'Food', 'GCash', 'milktea', '2026-09-28', 'day', '2026-09-28 12:17:31');
 
 -- --------------------------------------------------------
 
@@ -108,19 +113,22 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `profile_picture` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `notify_budget_alerts` tinyint(1) NOT NULL DEFAULT 1
+  `notify_budget_alerts` tinyint(1) NOT NULL DEFAULT 1,
+  `has_seen_tour` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `full_name`, `email`, `password`, `profile_picture`, `created_at`, `notify_budget_alerts`) VALUES
-(4, 'Irish Kaye Cuenca', 'cuenca.irishkaye.d@gmail.com', '$2y$10$TmCgRVRVjwnFf9EiiAIJ..anS7yEMO6Pbd1LB3uDucH7y625SFRiu', NULL, '2026-09-14 09:08:10', 1),
-(5, 'Sidebar Test', 'sidebar_test_1789377424832@example.com', '$2y$10$yOgO8Vv7uEb/9o2SCZMYEu7FhY1qt/MtaMQ.WBWtGiM9Eh2V2lWE2', NULL, '2026-09-14 09:17:09', 1),
-(7, 'Sidebar Test', 'sidebar_test_1789377665025@example.com', '$2y$10$NqCGHworoDZj7D.mwIoEDeJ14RvqsBi2g7.Dt3cGuewpzGt8srDnu', NULL, '2026-09-14 09:21:05', 1),
-(8, 'Sidebar Test', 'sidebar_test_1789377708327@example.com', '$2y$10$/ofWaVzu0IhpQt.89q6Ryu0TjbI7jU/SSMlWkKRC/sGTRwQi96/Y2', NULL, '2026-09-14 09:21:48', 1),
-(9, 'Sidebar Test', 'sidebar_test_1789377767826@example.com', '$2y$10$BGUlCyKjPxXpOp9u8zLBUemk1bjx6xSk/7bjXZg/6Sm.Qznf.ueS6', NULL, '2026-09-14 09:22:48', 1);
+INSERT INTO `users` (`id`, `full_name`, `email`, `password`, `profile_picture`, `created_at`, `notify_budget_alerts`, `has_seen_tour`) VALUES
+(4, 'Irish Kaye Cuenca', 'cuenca.irishkaye.d@gmail.com', '$2y$10$KxZL5oPalJ08kCyquid/NO3UlNWpI2rgIp/VSkY0zHIc0ZDtqCsMi', NULL, '2026-09-14 09:08:10', 1, 1),
+(5, 'Sidebar Test', 'sidebar_test_1789377424832@example.com', '$2y$10$yOgO8Vv7uEb/9o2SCZMYEu7FhY1qt/MtaMQ.WBWtGiM9Eh2V2lWE2', NULL, '2026-09-14 09:17:09', 1, 1),
+(7, 'Sidebar Test', 'sidebar_test_1789377665025@example.com', '$2y$10$NqCGHworoDZj7D.mwIoEDeJ14RvqsBi2g7.Dt3cGuewpzGt8srDnu', NULL, '2026-09-14 09:21:05', 1, 1),
+(8, 'Sidebar Test', 'sidebar_test_1789377708327@example.com', '$2y$10$/ofWaVzu0IhpQt.89q6Ryu0TjbI7jU/SSMlWkKRC/sGTRwQi96/Y2', NULL, '2026-09-14 09:21:48', 1, 1),
+(9, 'Sidebar Test', 'sidebar_test_1789377767826@example.com', '$2y$10$BGUlCyKjPxXpOp9u8zLBUemk1bjx6xSk/7bjXZg/6Sm.Qznf.ueS6', NULL, '2026-09-14 09:22:48', 1, 1),
+(37, 'juan de la cruz', 'juan@gmail.com', '$2y$10$qxPgFqfeohoqDVgBFhyEg.lUkK3ZY6bnU5kTlRPMDcwXzMmnU1NxS', NULL, '2026-09-28 11:32:18', 1, 1),
+(39, 'juan delacruz', 'juan0@gmail.com', '$2y$10$5d1rjUbds9ZMS147YJlHaep9fZWVyCtPnWaPCxJc37BWm3T0Ulalu', NULL, '2026-09-28 11:52:19', 1, 0);
 
 --
 -- Indexes for dumped tables
@@ -162,13 +170,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budgets`
 --
 ALTER TABLE `budgets`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=604;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=607;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
@@ -180,7 +188,7 @@ ALTER TABLE `password_resets`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Constraints for dumped tables

@@ -20,8 +20,8 @@ $activePage = 'dashboard';
 $budgetSnapshot = peso_budget_snapshot($pdo, $userId, $CATEGORIES);
 
 $showWelcome = !empty($_SESSION['just_logged_in']);
-$isNewSignup = !empty($_SESSION['just_registered']);
-unset($_SESSION['just_logged_in'], $_SESSION['just_registered']);
+$isNewSignup = !empty($_SESSION['first_login']);
+unset($_SESSION['just_logged_in'], $_SESSION['first_login']);
 
 $selectedMonth = $_GET['month'] ?? date('Y-m');
 if (!preg_match('/^\d{4}-\d{2}$/', $selectedMonth)) {

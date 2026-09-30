@@ -62,12 +62,13 @@ if (empty($errors)) {
 
         peso_notify_new_account($fullName, $email);
 
-        $_SESSION['user_id'] = $pdo->lastInsertId();
-        $_SESSION['full_name'] = $fullName;
-        $_SESSION['just_logged_in'] = true;
-        $_SESSION['just_registered'] = true;
+        // No auto-login: send the new user to the Log In form with their email
+        // pre-filled. The welcome tour runs on their first login instead.
+        $_SESSION['auth_modal'] = 'login';
+        $_SESSION['auth_success'] = 'Your account has been created. Please log in to continue.';
+        $_SESSION['auth_old'] = ['email' => $email];
 
-        header('Location: dashboard.php');
+        header('Location: index.php');
         exit;
     }
 }

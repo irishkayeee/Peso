@@ -28,7 +28,7 @@ if ($email === '' && $password === '') {
 } elseif ($password === '') {
     $errors[] = 'Please enter your password.';
 } else {
-    $stmt = $pdo->prepare('SELECT id, full_name, password FROM users WHERE email = ?');
+    $stmt = $pdo->prepare('SELECT id, full_name, password, has_seen_tour FROM users WHERE email = ?');
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
@@ -37,6 +37,13 @@ if ($email === '' && $password === '') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['full_name'] = $user['full_name'];
         $_SESSION['just_logged_in'] = true;
+
+        // First login after signup: show the "Welcome to PESO" dialog and the
+        // guided tour once, then remember it so later logins skip it.
+        if (empty($user['has_seen_tour'])) {
+            $_SESSION['first_login'] = true;
+            $pdo->prepare('UPDATE users SET has_seen_tour = 1 WHERE id = ?')->execute([$user['id']]);
+        }
 
         header('Location: dashboard.php');
         exit;

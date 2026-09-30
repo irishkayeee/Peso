@@ -10,7 +10,8 @@ $pageTitle = "PESO - Personal Expense & Spending Overview";
 $authModal = $_SESSION['auth_modal'] ?? null;
 $authErrors = $_SESSION['auth_errors'] ?? [];
 $authOld = $_SESSION['auth_old'] ?? [];
-unset($_SESSION['auth_modal'], $_SESSION['auth_errors'], $_SESSION['auth_old']);
+$authSuccess = $_SESSION['auth_success'] ?? null;
+unset($_SESSION['auth_modal'], $_SESSION['auth_errors'], $_SESSION['auth_old'], $_SESSION['auth_success']);
 
 $oldEmail = htmlspecialchars($authOld['email'] ?? '');
 $oldFirstName = htmlspecialchars($authOld['first_name'] ?? '');
@@ -322,6 +323,12 @@ if ($authModal === 'register' && !empty($authErrors)) {
 
         <h1 id="loginModalLabel">Log in to PESO</h1>
         <p class="auth-subtitle">Welcome back! Please enter your details.</p>
+
+        <?php if ($authModal === 'login' && $authSuccess): ?>
+          <div class="auth-alert auth-alert-success mb-3">
+            <i class="bi bi-check-circle-fill me-1"></i> <?php echo htmlspecialchars($authSuccess); ?>
+          </div>
+        <?php endif; ?>
 
         <?php if ($authModal === 'login' && !empty($authErrors)): ?>
           <div class="auth-alert auth-alert-danger mb-3">
