@@ -22,11 +22,8 @@ document.addEventListener('DOMContentLoaded', function () {
     return d.getFullYear() + '-' + m + '-' + day;
   }
 
-  // ---- Budget gate: block the form before submit once a set budget
-  // (category-specific or overall) is already used up for the selected
-  // Applies-To period, using the snapshot the page embedded. ----
+  // ---- Budget gate: budgets apply to the overall period, not categories. ----
   var originalAmount = 0;
-  var originalCategory = null;
   var originalPeriodType = null;
 
   function pesoFmt(v) {
@@ -35,19 +32,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function budgetGateMessage() {
     var snapshot = window.PESO_BUDGET_SNAPSHOT || {};
-    var category = categoryInput.value;
     var periodType = periodTypeInput.value;
-    var periodData = snapshot[periodType] || { categories: {}, overall: { budget: 0, spent: 0 } };
-    var catData = periodData.categories[category] || { budget: 0, spent: 0 };
+    var periodData = snapshot[periodType] || { overall: { budget: 0, spent: 0 } };
     var overallData = periodData.overall || { budget: 0, spent: 0 };
 
     var isSamePeriod = !!idInput.value && originalPeriodType === periodType;
-    var catSpent = catData.spent - (isSamePeriod && originalCategory === category ? originalAmount : 0);
     var overallSpent = overallData.spent - (isSamePeriod ? originalAmount : 0);
 
-    if (catData.budget > 0 && catSpent >= catData.budget) {
-      return 'Your ' + category + ' budget is already used up for this period (' + pesoFmt(Math.max(catData.budget - catSpent, 0)) + ' left). Raise the budget or remove an expense before adding more.';
-    }
     if (overallData.budget > 0 && overallSpent >= overallData.budget) {
       var periodLabel = { day: 'daily', week: 'weekly', month: 'monthly' }[periodType] || periodType;
       return 'Your overall ' + periodLabel + ' budget is already used up for this period (' + pesoFmt(Math.max(overallData.budget - overallSpent, 0)) + ' left). Raise the budget or remove an expense before adding more.';
@@ -70,9 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  [categoryInput, periodTypeInput].forEach(function (el) {
-    el.addEventListener('change', refreshBudgetGate);
-  });
+  periodTypeInput.addEventListener('change', refreshBudgetGate);
 
   modalEl.addEventListener('show.bs.modal', function (event) {
     var trigger = event.relatedTarget;
@@ -91,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
       descriptionInput.value = trigger.getAttribute('data-description') || '';
 
       originalAmount = parseFloat(amountInput.value) || 0;
-      originalCategory = categoryInput.value;
       originalPeriodType = periodTypeInput.value;
     } else {
       titleEl.textContent = 'Add Expense';
@@ -100,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
       dateInput.value = todayStr();
 
       originalAmount = 0;
-      originalCategory = null;
       originalPeriodType = null;
     }
 

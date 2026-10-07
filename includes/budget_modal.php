@@ -1,9 +1,5 @@
 <?php
-/**
- * PESO - Set Budget modal (overall or per-category)
- * Requires $CATEGORIES from includes/categories.php and
- * $periodType / $periodStart / $periodEnd / $periodLabel from the including page.
- */
+/** PESO - Set overall budget modal */
 ?>
 <div class="modal fade auth-modal" id="budgetModal" tabindex="-1" aria-labelledby="budgetModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -20,19 +16,6 @@
           <input type="hidden" name="period_type" value="<?php echo htmlspecialchars($periodType ?? 'month'); ?>">
           <input type="hidden" name="period_start" value="<?php echo htmlspecialchars($periodStart ?? ''); ?>">
           <input type="hidden" name="period_end" value="<?php echo htmlspecialchars($periodEnd ?? ''); ?>">
-
-          <div class="mb-3">
-            <label class="form-label" for="budgetCategory">Applies To</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-tag"></i></span>
-              <select class="form-control" id="budgetCategory" name="category">
-                <option value="">Overall Budget</option>
-                <?php foreach ($CATEGORIES as $cat): ?>
-                  <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-          </div>
 
           <div class="mb-4">
             <label class="form-label" for="budgetAmount">Budget Amount</label>

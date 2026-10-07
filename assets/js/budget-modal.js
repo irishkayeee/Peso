@@ -5,15 +5,13 @@ document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('budgetForm');
   var formError = document.getElementById('budgetFormError');
   var submitBtn = document.getElementById('budgetSubmitBtn');
-  var categorySelect = document.getElementById('budgetCategory');
   var amountInput = document.getElementById('budgetAmount');
 
   modalEl.addEventListener('show.bs.modal', function (event) {
     var trigger = event.relatedTarget;
     formError.hidden = true;
 
-    if (trigger && trigger.hasAttribute('data-category')) {
-      categorySelect.value = trigger.getAttribute('data-category') || '';
+    if (trigger && trigger.hasAttribute('data-amount')) {
       amountInput.value = trigger.getAttribute('data-amount') || '';
     } else {
       form.reset();

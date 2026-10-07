@@ -17,7 +17,7 @@ $userId = (int) $_SESSION['user_id'];
 $pageTitle = "Dashboard - PESO";
 $activePage = 'dashboard';
 
-$budgetSnapshot = peso_budget_snapshot($pdo, $userId, $CATEGORIES);
+$budgetSnapshot = peso_budget_snapshot($pdo, $userId);
 
 $showWelcome = !empty($_SESSION['just_logged_in']);
 $isNewSignup = !empty($_SESSION['first_login']);
@@ -339,39 +339,18 @@ if (empty($keyInsights)) {
     ];
 }
 
-// ---- Budget alert: category with highest utilization vs its own budget.
-// Always the current calendar month, regardless of the Day/Week/Month
-// toggle or month picker (FR-18). ----
+// ---- Overall budget alert for the current calendar month. ----
 $currentMonthStart = date('Y-m-01');
 $currentMonthEnd = date('Y-m-t');
 
-$stmt = $pdo->prepare(
-    'SELECT category, SUM(amount) AS total FROM expenses
-     WHERE user_id = ? AND expense_date BETWEEN ? AND ?
-     GROUP BY category'
-);
-$stmt->execute([$userId, $currentMonthStart, $currentMonthEnd]);
-$currentMonthBreakdown = $stmt->fetchAll();
-
-$stmt = $pdo->prepare("SELECT category, amount FROM budgets WHERE user_id = ? AND category != '' AND period_type = 'month' AND period_start = ?");
+$stmt = $pdo->prepare("SELECT amount FROM budgets WHERE user_id = ? AND category = '' AND period_type = 'month' AND period_start = ?");
 $stmt->execute([$userId, $currentMonthStart]);
-$categoryBudgets = $stmt->fetchAll();
-
-$budgetAlert = null;
-foreach ($categoryBudgets as $cb) {
-    $spent = 0;
-    foreach ($currentMonthBreakdown as $c) {
-        if ($c['category'] === $cb['category']) {
-            $spent = (float) $c['total'];
-            break;
-        }
-    }
-    if ($cb['amount'] <= 0) continue;
-    $pct = ($spent / $cb['amount']) * 100;
-    if ($pct >= 80 && (!$budgetAlert || $pct > $budgetAlert['pct'])) {
-        $budgetAlert = ['category' => $cb['category'], 'pct' => $pct, 'spent' => $spent, 'budget' => (float) $cb['amount']];
-    }
-}
+$currentMonthBudget = (float) ($stmt->fetchColumn() ?: 0);
+$stmt = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE user_id = ? AND expense_date BETWEEN ? AND ? AND period_type = 'month'");
+$stmt->execute([$userId, $currentMonthStart, $currentMonthEnd]);
+$currentMonthSpent = (float) $stmt->fetchColumn();
+$budgetAlertPct = $currentMonthBudget > 0 ? ($currentMonthSpent / $currentMonthBudget) * 100 : 0;
+$budgetAlert = $currentMonthBudget > 0 && $budgetAlertPct >= 80;
 
 // ---- Recent transactions ----
 $stmt = $pdo->prepare(
@@ -570,7 +549,7 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
               <i class="bi bi-exclamation-triangle-fill"></i>
               <div class="flex-grow-1">
                 <h3>Budget Alert</h3>
-                <p>You're <?php echo number_format($budgetAlert['pct'], 0); ?>% towards your <?php echo htmlspecialchars($budgetAlert['category']); ?> budget.</p>
+                <p>You've used <?php echo number_format($budgetAlertPct, 0); ?>% of your overall monthly budget.</p>
               </div>
               <a href="budgets.php" class="btn btn-forest">View Details</a>
             </div>

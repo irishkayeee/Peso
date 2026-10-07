@@ -2,22 +2,21 @@
 /**
  * PESO - Outgoing mail configuration (SMTP via PHPMailer)
  *
- * Fill in the values below with your sending account's details, e.g. for
- * Gmail: host smtp.gmail.com, port 587, your Gmail address as the username,
- * and a Google Account "App Password" (not your normal password) as
- * MAIL_PASSWORD - generate one at https://myaccount.google.com/apppasswords
+ * Add your Gmail address and Google Account App Password below.
+ * Do not use your normal Gmail password.
  *
- * Any other SMTP provider (Outlook, a custom domain mailbox, etc.) works the
- * same way - just use that provider's host/port/username/password.
+ * Keep this file out of public repositories and do not commit it after adding
+ * credentials.
  */
 
-define('MAIL_HOST', '');           // e.g. 'smtp.gmail.com'
+define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_PORT', 587);
-define('MAIL_USERNAME', '');       // the PESO sending email address
-define('MAIL_PASSWORD', '');       // SMTP password / app password
-define('MAIL_FROM_EMAIL', '');     // usually same as MAIL_USERNAME
+define('MAIL_USERNAME', ''); // Your Gmail address
+define('MAIL_PASSWORD', ''); // Your Gmail App Password, without spaces
+define('MAIL_FROM_EMAIL', MAIL_USERNAME);
 define('MAIL_FROM_NAME', 'PESO');
-define('MAIL_ENCRYPTION', 'tls');  // 'tls' or 'ssl'
+define('MAIL_ENCRYPTION', 'tls');
+define('MAIL_CA_FILE', __DIR__ . '/mail-ca-bundle.pem');
 
 // Where "new account created" notifications are sent. Defaults to the
 // sending address itself if left blank.

@@ -145,12 +145,10 @@ function peso_recent_months(string $selectedMonth, int $count = 12): array
 }
 
 /**
- * Budget + spent snapshot for the CURRENT day/week/month periods, per
- * category and overall (category ''). Used by the Add/Edit Expense form
- * to warn about (and block) an expense once a set budget is used up,
- * before the user even submits.
+ * Overall budget + spent snapshot for the CURRENT day/week/month periods.
+ * Used by the Add/Edit Expense form to enforce the overall budget limit.
  */
-function peso_budget_snapshot(PDO $pdo, int $userId, array $categories): array
+function peso_budget_snapshot(PDO $pdo, int $userId): array
 {
     $snapshot = [];
 
@@ -159,33 +157,15 @@ function peso_budget_snapshot(PDO $pdo, int $userId, array $categories): array
         $start = $range['start'];
         $end = $range['end'];
 
-        $budgetStmt = $pdo->prepare('SELECT category, amount FROM budgets WHERE user_id = ? AND period_start = ? AND period_end = ?');
+        $budgetStmt = $pdo->prepare("SELECT amount FROM budgets WHERE user_id = ? AND category = '' AND period_start = ? AND period_end = ?");
         $budgetStmt->execute([$userId, $start, $end]);
-        $budgets = [];
-        foreach ($budgetStmt->fetchAll() as $row) {
-            $budgets[$row['category']] = (float) $row['amount'];
-        }
+        $overallBudget = (float) ($budgetStmt->fetchColumn() ?: 0);
 
-        $spentStmt = $pdo->prepare('SELECT category, SUM(amount) AS total FROM expenses WHERE user_id = ? AND expense_date BETWEEN ? AND ? AND period_type = ? GROUP BY category');
+        $spentStmt = $pdo->prepare('SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE user_id = ? AND expense_date BETWEEN ? AND ? AND period_type = ?');
         $spentStmt->execute([$userId, $start, $end, $type]);
-        $spentByCategory = [];
-        $totalSpent = 0.0;
-        foreach ($spentStmt->fetchAll() as $row) {
-            $spentByCategory[$row['category']] = (float) $row['total'];
-            $totalSpent += (float) $row['total'];
-        }
+        $totalSpent = (float) $spentStmt->fetchColumn();
 
-        $entry = [
-            'overall' => ['budget' => $budgets[''] ?? 0, 'spent' => $totalSpent],
-            'categories' => [],
-        ];
-        foreach ($categories as $cat) {
-            $entry['categories'][$cat] = [
-                'budget' => $budgets[$cat] ?? 0,
-                'spent' => $spentByCategory[$cat] ?? 0,
-            ];
-        }
-        $snapshot[$type] = $entry;
+        $snapshot[$type] = ['overall' => ['budget' => $overallBudget, 'spent' => $totalSpent]];
     }
 
     return $snapshot;
