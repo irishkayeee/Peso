@@ -27,14 +27,20 @@ $navItems = [
 ?>
 <aside class="dash-sidebar">
   <div>
-    <a href="dashboard.php" class="dash-sidebar-logo">
-      <span class="logo-img-wrap logo-img-wrap-full">
-        <img src="assets/img/peso_logo.png" alt="PESO Logo" class="logo-img">
-      </span>
-      <span class="logo-img-wrap logo-img-wrap-icon">
-        <img src="assets/img/peso_icon.png" alt="PESO" class="logo-icon-img">
-      </span>
-    </a>
+    <div class="dash-sidebar-head">
+      <a href="dashboard.php" class="dash-sidebar-logo">
+        <span class="logo-img-wrap logo-img-wrap-full">
+          <img src="assets/img/peso_logo.png" alt="PESO Logo" class="logo-img">
+        </span>
+        <span class="logo-img-wrap logo-img-wrap-icon">
+          <img src="assets/img/peso_icon.png" alt="PESO" class="logo-icon-img">
+        </span>
+      </a>
+      <!-- Cream header curves down into the green body -->
+      <svg class="dash-sidebar-wave" viewBox="0 0 260 70" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 28 C55 2 110 12 160 34 C200 52 235 48 260 30 L260 70 L0 70 Z" fill="#245C4A"/>
+      </svg>
+    </div>
 
     <a href="profile.php" class="dash-sidebar-user">
       <span class="dash-sidebar-user-avatar">
@@ -46,8 +52,6 @@ $navItems = [
       </span>
       <span class="dash-sidebar-user-name"><?php echo htmlspecialchars($_SESSION['full_name'] ?? ''); ?></span>
     </a>
-
-    <hr class="dash-sidebar-divider">
 
     <nav class="dash-nav">
       <?php foreach ($navItems as $key => $item): ?>

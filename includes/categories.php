@@ -33,6 +33,42 @@ function peso_category_color(string $category): string
     return $CATEGORY_COLORS[$category] ?? '#B8B2A0';
 }
 
+// Distinct pastel card backgrounds for the Budgets page category cards
+$CATEGORY_PASTELS = [
+    'Food'           => '#F1FAF4', // mint
+    'Transportation' => '#F0F6FC', // sky blue
+    'Education'      => '#FEF9EC', // butter yellow
+    'Bills'          => '#F5F2FB', // lavender
+    'Shopping'       => '#FEF4EE', // peach
+    'Entertainment'  => '#FDF1F3', // blush pink
+    'Health'         => '#EEF9F8', // aqua
+    'Others'         => '#F8F5F0', // sand
+];
+
+function peso_category_pastel(string $category): string
+{
+    global $CATEGORY_PASTELS;
+    return $CATEGORY_PASTELS[$category] ?? '#F8F5F0';
+}
+
+// Deeper tone of each pastel, for text/icons sitting on the pastel (expense chips)
+$CATEGORY_ACCENTS = [
+    'Food'           => '#2E7D5B',
+    'Transportation' => '#2F6FA8',
+    'Education'      => '#9A6B12',
+    'Bills'          => '#6B55A3',
+    'Shopping'       => '#B5642F',
+    'Entertainment'  => '#B04A5E',
+    'Health'         => '#2A8079',
+    'Others'         => '#7A6E58',
+];
+
+function peso_category_accent(string $category): string
+{
+    global $CATEGORY_ACCENTS;
+    return $CATEGORY_ACCENTS[$category] ?? '#7A6E58';
+}
+
 function peso_category_icon(string $category): string
 {
     global $CATEGORY_ICONS;

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="60" fill="#E3F4EA"/>
+  <!-- money plant: coin leaves -->
+  <path d="M60 58 C60 44 58 34 60 24" fill="none" stroke="#3E7C64" stroke-width="4" stroke-linecap="round"/>
+  <path d="M60 44 C46 46 36 36 36 24 C50 24 60 32 60 44 Z" fill="#7FBF92"/>
+  <path d="M60 38 C72 40 84 32 86 20 C72 18 62 26 60 38 Z" fill="#5FA873"/>
+  <circle cx="60" cy="20" r="8" fill="#F5C451" stroke="#D9A441" stroke-width="2"/>
+  <text x="60" y="24.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#A8761E">₱</text>
+  <!-- pot buddy -->
+  <path d="M30 58 H90 L84 102 Q83 106 79 106 H41 Q37 106 36 102 Z" fill="#E7A27C"/>
+  <rect x="26" y="54" width="68" height="12" rx="6" fill="#D98C63"/>
+  <circle cx="49" cy="80" r="3.8" fill="#4A2E20"/>
+  <circle cx="71" cy="80" r="3.8" fill="#4A2E20"/>
+  <circle cx="50.2" cy="78.8" r="1.2" fill="#fff"/>
+  <circle cx="72.2" cy="78.8" r="1.2" fill="#fff"/>
+  <path d="M54 88 Q60 94 66 88" fill="none" stroke="#4A2E20" stroke-width="2.6" stroke-linecap="round"/>
+  <ellipse cx="41" cy="88" rx="5" ry="3.2" fill="#F29AAB" opacity="0.6"/>
+  <ellipse cx="79" cy="88" rx="5" ry="3.2" fill="#F29AAB" opacity="0.6"/>
+</svg>

@@ -376,7 +376,7 @@ foreach ($categoryBudgets as $cb) {
 // ---- Recent transactions ----
 $stmt = $pdo->prepare(
     'SELECT id, amount, category, description, expense_date FROM expenses
-     WHERE user_id = ? ORDER BY expense_date DESC, id DESC LIMIT 4'
+     WHERE user_id = ? ORDER BY expense_date DESC, id DESC LIMIT 5'
 );
 $stmt->execute([$userId]);
 $recentTransactions = $stmt->fetchAll();
@@ -468,7 +468,7 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
         </div>
 
         <?php if ($range === 'month'): ?>
-          <select class="dash-select" onchange="location.href='dashboard.php?range=month&month=' + this.value">
+          <select class="dash-select js-pretty-select" onchange="location.href='dashboard.php?range=month&month=' + this.value">
             <?php foreach ($monthOptions as $value => $label): ?>
               <option value="<?php echo $value; ?>" <?php echo $value === $selectedMonth ? 'selected' : ''; ?>><?php echo htmlspecialchars($label); ?></option>
             <?php endforeach; ?>
@@ -477,7 +477,7 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
           <input type="date" class="dash-select" value="<?php echo $selectedDay; ?>" max="<?php echo date('Y-m-d'); ?>"
             onchange="location.href='dashboard.php?range=day&day=' + this.value">
         <?php elseif ($range === 'week'): ?>
-          <select class="dash-select" onchange="location.href='dashboard.php?range=week&week=' + this.value">
+          <select class="dash-select js-pretty-select" onchange="location.href='dashboard.php?range=week&week=' + this.value">
             <?php foreach ($weekOptions as $value => $label): ?>
               <option value="<?php echo $value; ?>" <?php echo $value === $selectedWeekStart ? 'selected' : ''; ?>><?php echo htmlspecialchars($label); ?></option>
             <?php endforeach; ?>
@@ -493,8 +493,9 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
     <!-- Summary cards -->
     <div class="dash-fold-summary row g-3 mb-3">
       <div class="col-6 col-lg-3">
-        <div class="dash-card summary-card h-100">
-          <div>
+        <div class="dash-card summary-card summary-card--mint js-card-link h-100" data-href="expenses.php">
+          <div class="summary-card-icon"><i class="bi bi-database"></i></div>
+          <div class="summary-card-body">
             <div class="summary-card-label">Total Expenses</div>
             <div class="summary-card-value"><?php echo peso_format_currency($chartTotal); ?></div>
             <?php if ($chartPrevTotal > 0): ?>
@@ -504,46 +505,49 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
               </div>
             <?php endif; ?>
           </div>
-          <div class="summary-card-icon"><i class="bi bi-receipt"></i></div>
+          <i class="bi bi-chevron-right summary-card-chevron"></i>
         </div>
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="dash-card summary-card h-100">
-          <div style="width:100%;">
+        <div class="dash-card summary-card summary-card--sage js-card-link h-100" data-href="budgets.php?period=<?php echo $range; ?>">
+          <div class="summary-card-icon"><i class="bi bi-wallet2"></i></div>
+          <div class="summary-card-body">
             <div class="summary-card-label"><?php echo $rangeBudgetLabel; ?></div>
             <?php if ($periodBudget > 0): ?>
               <div class="summary-card-value"><?php echo peso_format_currency($periodBudget); ?></div>
               <div class="summary-progress"><div class="summary-progress-bar" style="width:<?php echo min($periodUsedPct, 100); ?>%; background-color:<?php echo peso_progress_color($periodUsedPct); ?>;"></div></div>
               <div class="summary-trend neutral"><?php echo number_format($periodUsedPct, 0); ?>% used</div>
             <?php elseif ($isPastPeriod): ?>
-              <div class="summary-card-value" style="font-size:1rem;">Not set</div>
+              <div class="summary-card-value">Not set</div>
               <div class="summary-trend neutral">No budget was set that <?php echo $rangePastNoun; ?></div>
             <?php else: ?>
-              <div class="summary-card-value" style="font-size:1rem;">Not set</div>
+              <div class="summary-card-value">Not set</div>
               <a href="budgets.php?period=<?php echo $range; ?>" class="summary-trend neutral" style="text-decoration:underline;">Set a budget</a>
             <?php endif; ?>
           </div>
-          <div class="summary-card-icon"><i class="bi bi-bullseye"></i></div>
+          <i class="bi bi-chevron-right summary-card-chevron"></i>
         </div>
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="dash-card summary-card h-100">
-          <div>
+        <div class="dash-card summary-card summary-card--peach js-card-link h-100" data-href="budgets.php?period=<?php echo $range; ?>">
+          <div class="summary-card-icon gold"><i class="bi bi-piggy-bank"></i></div>
+          <div class="summary-card-body">
             <div class="summary-card-label">Remaining Budget</div>
-            <div class="summary-card-value gold"><?php echo peso_format_currency(max($periodRemaining, 0)); ?></div>
+            <div class="summary-card-value"><?php echo peso_format_currency(max($periodRemaining, 0)); ?></div>
             <?php if ($periodBudget > 0 && $periodRemaining < 0): ?>
               <div class="summary-trend down"><i class="bi bi-exclamation-triangle"></i> Over budget</div>
             <?php endif; ?>
           </div>
-          <div class="summary-card-icon gold"><i class="bi bi-wallet2"></i></div>
+          <i class="bi bi-chevron-right summary-card-chevron"></i>
         </div>
       </div>
 
       <div class="col-6 col-lg-3">
-        <div class="dash-card summary-card h-100">
-          <div>
+        <div class="dash-card summary-card summary-card--sky js-card-link h-100" data-href="insights.php">
+          <div class="summary-card-icon sky"><i class="bi bi-safe"></i></div>
+          <div class="summary-card-body">
             <div class="summary-card-label"><?php echo $rangeSavingsLabel; ?></div>
             <div class="summary-card-value"><?php echo peso_format_currency($periodSavings); ?></div>
             <?php if ($savingsMode === 'budget' && $periodSavings > 0): ?>
@@ -556,59 +560,17 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
               <div class="summary-trend up"><i class="bi bi-arrow-up"></i> <?php echo number_format($periodSavingsPct, 0); ?>% <?php echo $rangeCompareLabel; ?></div>
             <?php endif; ?>
           </div>
-          <div class="summary-card-icon"><i class="bi bi-piggy-bank"></i></div>
+          <i class="bi bi-chevron-right summary-card-chevron"></i>
         </div>
       </div>
     </div>
 
-    <!-- Breakdown + insights -->
+    <!-- Breakdown + category analysis -->
     <div class="dash-fold-row row g-3 mb-3">
-      <div class="col-lg-7">
-        <div class="d-flex flex-column gap-3 h-100">
-          <?php if ($budgetAlert): ?>
-            <div class="alert-card">
-              <i class="bi bi-exclamation-triangle-fill"></i>
-              <div class="flex-grow-1">
-                <h3>Budget Alert</h3>
-                <p>You're <?php echo number_format($budgetAlert['pct'], 0); ?>% towards your <?php echo htmlspecialchars($budgetAlert['category']); ?> budget.</p>
-              </div>
-              <a href="budgets.php" class="btn btn-forest">View Details</a>
-            </div>
-          <?php endif; ?>
-
-          <div class="dash-card flex-grow-1">
-            <div class="dash-card-header">
-              <h2>Recent Transactions</h2>
-              <a href="expenses.php">View All</a>
-            </div>
-
-            <?php if (empty($recentTransactions)): ?>
-              <div class="empty-state">
-                <i class="bi bi-receipt"></i>
-                No transactions yet.
-              </div>
-            <?php else: ?>
-              <?php foreach ($recentTransactions as $t): ?>
-                <div class="transaction-item">
-                  <span class="transaction-icon" style="background-color:<?php echo peso_category_color($t['category']); ?>;">
-                    <i class="bi <?php echo peso_category_icon($t['category']); ?>"></i>
-                  </span>
-                  <div class="transaction-info">
-                    <div class="transaction-name"><?php echo htmlspecialchars($t['description'] ?: $t['category']); ?></div>
-                    <div class="transaction-meta"><?php echo htmlspecialchars($t['category']); ?> &middot; <?php echo date('M j, Y', strtotime($t['expense_date'])); ?></div>
-                  </div>
-                  <div class="transaction-amount"><?php echo peso_format_currency($t['amount']); ?></div>
-                </div>
-              <?php endforeach; ?>
-            <?php endif; ?>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-5">
+      <div class="col-lg-6">
         <div class="dash-card h-100">
           <div class="dash-card-header">
-            <h2>Spending Breakdown</h2>
+            <h2><span class="dash-card-icon"><i class="bi bi-pie-chart"></i></span>Spending Breakdown</h2>
             <span class="d-flex align-items-center gap-2">
               <button type="button" id="donutResetBtn" class="dash-link" style="display:none; background:none; border:none; padding:0;">Show All</button>
               <span class="period-type-pill"><?php echo htmlspecialchars($chartPeriodLabel); ?></span>
@@ -634,16 +596,13 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
               </div>
               <div class="col-sm-7">
                 <ul class="donut-legend" id="donutLegend">
-                  <?php foreach ($chartCategoryBreakdown as $c):
-                    $pct = $chartTotal > 0 ? ($c['total'] / $chartTotal) * 100 : 0;
-                  ?>
+                  <?php foreach ($chartCategoryBreakdown as $c): ?>
                     <li data-category="<?php echo htmlspecialchars($c['category']); ?>">
                       <span class="donut-legend-label">
                         <span class="donut-legend-dot" style="background-color:<?php echo peso_category_color($c['category']); ?>;"></span>
                         <?php echo htmlspecialchars($c['category']); ?>
                       </span>
                       <span class="donut-legend-amount"><?php echo peso_format_currency($c['total']); ?></span>
-                      <span class="donut-legend-percent"><?php echo number_format($pct, 0); ?>%</span>
                     </li>
                   <?php endforeach; ?>
                 </ul>
@@ -653,26 +612,11 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
           <?php endif; ?>
         </div>
       </div>
-    </div>
 
-    <!-- Trend + top categories -->
-    <div class="dash-fold-row row g-3">
-      <div class="col-lg-7">
+      <div class="col-lg-6">
         <div class="dash-card h-100">
           <div class="dash-card-header">
-            <h2>Spending Trend</h2>
-            <span class="period-type-pill"><?php echo htmlspecialchars($trendRangeLabel); ?></span>
-          </div>
-          <div class="chart-fill">
-            <canvas id="trendChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-5">
-        <div class="dash-card h-100">
-          <div class="dash-card-header">
-            <h2>Category Analysis</h2>
+            <h2><span class="dash-card-icon"><i class="bi bi-bar-chart"></i></span>Category Analysis</h2>
             <span class="period-type-pill"><?php echo htmlspecialchars($chartPeriodLabel); ?></span>
           </div>
 
@@ -690,14 +634,75 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
       </div>
     </div>
 
+    <hr class="dash-section-divider">
+
+    <!-- Recent transactions + trend -->
+    <div class="dash-fold-row row g-3">
+      <div class="col-lg-6">
+        <div class="d-flex flex-column gap-3 h-100">
+          <?php if ($budgetAlert): ?>
+            <div class="alert-card">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div class="flex-grow-1">
+                <h3>Budget Alert</h3>
+                <p>You're <?php echo number_format($budgetAlert['pct'], 0); ?>% towards your <?php echo htmlspecialchars($budgetAlert['category']); ?> budget.</p>
+              </div>
+              <a href="budgets.php" class="btn btn-forest">View Details</a>
+            </div>
+          <?php endif; ?>
+
+          <div class="dash-card flex-grow-1">
+            <div class="dash-card-header">
+              <h2><span class="dash-card-icon"><i class="bi bi-receipt"></i></span>Recent Transactions</h2>
+              <a href="expenses.php">View All</a>
+            </div>
+
+            <?php if (empty($recentTransactions)): ?>
+              <div class="empty-state">
+                <i class="bi bi-receipt"></i>
+                No transactions yet.
+              </div>
+            <?php else: ?>
+              <div class="transaction-list">
+              <?php foreach ($recentTransactions as $t): ?>
+                <div class="transaction-item">
+                  <span class="transaction-icon" style="background-color:<?php echo peso_category_color($t['category']); ?>;">
+                    <i class="bi <?php echo peso_category_icon($t['category']); ?>"></i>
+                  </span>
+                  <div class="transaction-info">
+                    <div class="transaction-name"><?php echo htmlspecialchars($t['description'] ?: $t['category']); ?></div>
+                    <div class="transaction-meta"><?php echo htmlspecialchars($t['category']); ?> &middot; <?php echo date('M j, Y', strtotime($t['expense_date'])); ?></div>
+                  </div>
+                  <div class="transaction-amount"><?php echo peso_format_currency($t['amount']); ?></div>
+                </div>
+              <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="dash-card h-100">
+          <div class="dash-card-header">
+            <h2><span class="dash-card-icon"><i class="bi bi-graph-up"></i></span>Spending Trend</h2>
+            <span class="period-type-pill"><?php echo htmlspecialchars($trendRangeLabel); ?></span>
+          </div>
+          <div class="chart-fill">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
     </div><!-- /.dash-fold -->
 
     <!-- Key Insights -->
     <div class="row g-3 mt-1">
       <div class="col-12">
-        <div class="dash-card">
+        <div class="dash-card key-insights-card">
           <div class="dash-card-header">
-            <h2>Key Insights</h2>
+            <h2><span class="dash-card-icon"><i class="bi bi-lightbulb"></i></span>Key Insights</h2>
             <span class="period-type-pill"><?php echo htmlspecialchars($chartPeriodLabel); ?></span>
           </div>
 
@@ -722,21 +727,40 @@ if ($range === 'day' && $selectedDay !== date('Y-m-d')) {
 <!-- Welcome modal (shown once right after login/signup) -->
 <div class="modal fade" id="welcomeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content ui-modal-content text-center">
-      <div class="welcome-modal-icon"><i class="bi bi-emoji-smile-fill"></i></div>
-      <h5><?php echo $isNewSignup ? 'Welcome to PESO' : 'Welcome back'; ?>, <?php echo htmlspecialchars($firstName); ?>!</h5>
-      <p class="text-muted small mb-0">
-        <?php echo $isNewSignup
-          ? "Your account is all set. Let's log your first expense and start building better money habits."
-          : "Here's a quick look at your spending overview for this month."; ?>
-      </p>
-      <button type="button" class="btn btn-forest mt-3" data-bs-dismiss="modal">Let's Go</button>
+    <div class="modal-content welcome-modal text-center">
+      <button type="button" class="btn-close welcome-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+      <div class="welcome-modal-hero">
+        <img src="assets/img/piggybank.png" alt="" aria-hidden="true">
+      </div>
+
+      <div class="welcome-modal-body">
+        <span class="welcome-modal-date"><i class="bi bi-calendar3"></i> <?php echo date('l, F j'); ?></span>
+        <h5>
+          <?php echo $isNewSignup ? 'Welcome to PESO' : 'Welcome back'; ?>,
+          <span class="welcome-modal-name"><?php echo htmlspecialchars($firstName); ?>!</span>
+        </h5>
+        <p>
+          <?php echo $isNewSignup
+            ? "Your account is all set. Let's log your first expense and start building better money habits."
+            : "Here's a quick look at your spending overview for this month."; ?>
+        </p>
+        <button type="button" class="btn btn-forest welcome-modal-btn" data-bs-dismiss="modal">
+          Let's Go <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+// Match charts to the page font and soften axis labels.
+Chart.defaults.font.family = "'Poppins', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = 'rgba(38, 51, 46, 0.6)';
+</script>
 <script src="assets/js/loading.js"></script>
 <script src="assets/js/dashboard.js"></script>
 <script src="assets/js/ui-modals.js"></script>
@@ -804,9 +828,33 @@ document.addEventListener('DOMContentLoaded', function () {
       }]
     },
     options: {
-      cutout: '68%',
+      cutout: '62%',
       plugins: { legend: { display: false }, tooltip: { enabled: true } }
-    }
+    },
+    plugins: [{
+      // Write each slice's share (e.g. "69%") on the ring; skip slivers too thin to fit text.
+      id: 'slicePercent',
+      afterDatasetsDraw: function (chart) {
+        var data = chart.data.datasets[0].data;
+        var sum = data.reduce(function (a, b) { return a + b; }, 0);
+        if (!sum) return;
+        var ctx = chart.ctx;
+        ctx.save();
+        ctx.font = "600 10px 'Poppins', sans-serif";
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+        ctx.shadowBlur = 2;
+        chart.getDatasetMeta(0).data.forEach(function (arc, i) {
+          var pct = data[i] / sum * 100;
+          if (pct < 6) return;
+          var pos = arc.tooltipPosition();
+          ctx.fillText(Math.round(pct) + '%', pos.x, pos.y);
+        });
+        ctx.restore();
+      }
+    }]
   });
 
   var barChart = new Chart(document.getElementById('categoryBarChart'), {
@@ -816,15 +864,22 @@ document.addEventListener('DOMContentLoaded', function () {
       datasets: [{
         data: totals,
         backgroundColor: colors.slice(),
-        borderRadius: 6
+        borderRadius: 6,
+        maxBarThickness: 26
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, ticks: { callback: function (v) { return pesoFmt(v); } } } },
+      plugins: {
+        // Category names are already on the y-axis, so no legend
+        legend: { display: false }
+      },
+      scales: {
+        x: { beginAtZero: true, border: { display: true, color: 'rgba(38, 51, 46, 0.25)' }, grid: { color: 'rgba(38, 51, 46, 0.06)' }, ticks: { callback: function (v) { return pesoFmt(v); } }, title: { display: true, text: 'Amount Spent (₱)', color: 'rgba(38, 51, 46, 0.7)', font: { size: 11, weight: '600' } } },
+        y: { border: { display: true, color: 'rgba(38, 51, 46, 0.25)' }, grid: { display: false }, title: { display: true, text: 'Category', color: 'rgba(38, 51, 46, 0.7)', font: { size: 11, weight: '600' } } }
+      },
       onClick: function (evt) {
         var points = barChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
         if (!points.length) return;
@@ -898,21 +953,34 @@ new Chart(document.getElementById('trendChart'), {
   data: {
     labels: <?php echo json_encode($trendLabels); ?>,
     datasets: [{
+      label: 'Total Spending',
       data: <?php echo json_encode($trendData); ?>,
       borderColor: '#245C4A',
       backgroundColor: 'rgba(36, 92, 74, 0.08)',
       fill: true,
       tension: 0.35,
-      pointBackgroundColor: '#245C4A',
-      pointRadius: 4
+      borderWidth: 2.5,
+      pointBackgroundColor: '#ffffff',
+      pointBorderColor: '#245C4A',
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6
     }]
   },
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle', padding: 12 },
+        onClick: function () {} // single series: don't let a click hide the line
+      }
+    },
     scales: {
-      y: { beginAtZero: true, ticks: { callback: function (v) { return '₱' + v.toLocaleString(); } } }
+      x: { border: { display: true, color: 'rgba(38, 51, 46, 0.25)' }, grid: { display: false }, title: { display: true, text: <?php echo json_encode($range === 'day' ? 'Day' : ($range === 'week' ? 'Week (starting)' : 'Month')); ?>, color: 'rgba(38, 51, 46, 0.7)', font: { size: 11, weight: '600' } } },
+      y: { beginAtZero: true, border: { display: true, color: 'rgba(38, 51, 46, 0.25)' }, grid: { color: 'rgba(38, 51, 46, 0.06)' }, ticks: { callback: function (v) { return '₱' + v.toLocaleString(); } }, title: { display: true, text: 'Amount Spent (₱)', color: 'rgba(38, 51, 46, 0.7)', font: { size: 11, weight: '600' } } }
     }
   }
 });

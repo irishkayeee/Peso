@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 120" preserveAspectRatio="xMaxYMax slice">
+  <defs>
+    <!-- Lines fade in from the left so their shortened start isn't abrupt -->
+    <linearGradient id="fadeIn" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5E8F7B" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#5E8F7B" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Thin flowing lines (right side only) -->
+  <path d="M330 52 C400 50 440 82 530 72 C610 64 655 42 700 36" fill="none" stroke="url(#fadeIn)" stroke-opacity="0.3" stroke-width="1.2"/>
+  <path d="M400 70 C470 68 560 96 700 74" fill="none" stroke="url(#fadeIn)" stroke-opacity="0.18" stroke-width="1"/>
+</svg>

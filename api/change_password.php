@@ -25,8 +25,14 @@ if (!$user || !password_verify($currentPassword, $user['password'])) {
     exit;
 }
 
-if (strlen($newPassword) < 8) {
-    echo json_encode(['success' => false, 'message' => 'New password must be at least 8 characters long.']);
+// Same rule as sign up (register.php)
+if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/', $newPassword)) {
+    echo json_encode(['success' => false, 'message' => 'New password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character.']);
+    exit;
+}
+
+if ($newPassword === $currentPassword) {
+    echo json_encode(['success' => false, 'message' => 'New password must be different from your current password.']);
     exit;
 }
 

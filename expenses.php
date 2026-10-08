@@ -99,11 +99,11 @@ $topbarSubtitle = 'Manage and track all your transactions.';
   <main class="dash-main">
     <?php include __DIR__ . '/includes/topbar.php'; ?>
 
-    <div class="dash-card mb-3">
+    <div class="dash-card expense-filter-card mb-3">
       <form class="filter-bar" method="GET" action="expenses.php">
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-search"></i></span>
-          <input type="text" class="form-control" name="search" placeholder="Search description or category" value="<?php echo htmlspecialchars($search); ?>">
+        <div class="filter-search">
+          <i class="bi bi-search"></i>
+          <input type="text" class="dash-select" name="search" placeholder="Search description or category..." value="<?php echo htmlspecialchars($search); ?>">
         </div>
 
         <select class="dash-select" name="category">
@@ -116,7 +116,7 @@ $topbarSubtitle = 'Manage and track all your transactions.';
         <input type="date" class="dash-select" name="date_from" value="<?php echo htmlspecialchars($dateFrom); ?>" title="From date">
         <input type="date" class="dash-select" name="date_to" value="<?php echo htmlspecialchars($dateTo); ?>" title="To date">
 
-        <button type="submit" class="btn btn-outline-forest">Filter</button>
+        <button type="submit" class="btn btn-outline-forest"><i class="bi bi-funnel me-1"></i> Filter</button>
         <?php if ($search || $categoryFilter || $dateFrom || $dateTo): ?>
           <a href="expenses.php" class="btn btn-outline-forest">Clear</a>
         <?php endif; ?>
@@ -127,16 +127,20 @@ $topbarSubtitle = 'Manage and track all your transactions.';
       </form>
     </div>
 
-    <div class="dash-card">
+    <div class="dash-card expense-table-card notebook-card">
+      <!-- Notebook decoration: spiral rings (purely visual) -->
+      <span class="notebook-rings" aria-hidden="true"></span>
+
       <div class="dash-card-header">
         <h2>
-          Transactions
+          <i class="bi bi-journal-text notebook-title-icon"></i>
+          <span class="notebook-title">Transactions</span>
           <?php if ($categoryViewLabel): ?>
             <span class="text-muted" style="font-weight:500; font-size:0.85rem;">&mdash; <?php echo $categoryViewLabel; ?></span>
           <?php endif; ?>
         </h2>
-        <span class="dash-select" style="border:none; background:none; font-weight:700; color:var(--forest-green);">
-          Total: <?php echo peso_format_currency($totalFiltered); ?>
+        <span class="expense-total-pill">
+          <span class="peso-coin">&#8369;</span> Total: <?php echo peso_format_currency($totalFiltered); ?>
         </span>
       </div>
 
@@ -150,7 +154,7 @@ $topbarSubtitle = 'Manage and track all your transactions.';
           <table class="dash-table">
             <thead>
               <tr>
-                <th>Date</th>
+                <th>Date <i class="bi bi-arrow-down"></i></th>
                 <th>Category</th>
                 <th>Description</th>
                 <th>Payment Method</th>
@@ -164,17 +168,17 @@ $topbarSubtitle = 'Manage and track all your transactions.';
                 <tr>
                   <td>
                     <?php echo date('M j, Y', strtotime($e['expense_date'])); ?>
-                    <div class="text-muted small"><?php echo date('g:i A', strtotime($e['created_at'])); ?> PHT</div>
+                    <div class="expense-time"><?php echo date('g:i A', strtotime($e['created_at'])); ?> PHT</div>
                   </td>
                   <td>
-                    <span class="category-pill" style="background-color:<?php echo peso_category_color($e['category']); ?>22; color:<?php echo peso_category_color($e['category']); ?>;">
+                    <span class="category-pill" style="--cat-bg:<?php echo peso_category_pastel($e['category']); ?>; --cat-accent:<?php echo peso_category_accent($e['category']); ?>;">
                       <i class="bi <?php echo peso_category_icon($e['category']); ?>"></i> <?php echo htmlspecialchars($e['category']); ?>
                     </span>
                   </td>
                   <td><?php echo htmlspecialchars($e['description'] ?: '—'); ?></td>
                   <td><?php echo htmlspecialchars($e['payment_method']); ?></td>
                   <td><span class="period-type-pill"><?php echo htmlspecialchars(peso_period_type_label($e['period_type'])); ?></span></td>
-                  <td class="text-end fw-semibold"><?php echo peso_format_currency($e['amount']); ?></td>
+                  <td class="text-end expense-amount"><?php echo peso_format_currency($e['amount']); ?></td>
                   <td class="text-end">
                     <button type="button" class="row-action-btn js-edit-expense"
                       data-bs-toggle="modal" data-bs-target="#expenseModal"
@@ -198,6 +202,8 @@ $topbarSubtitle = 'Manage and track all your transactions.';
             </tbody>
           </table>
         </div>
+        <!-- Filled by assets/js/expenses-pager.js (5 rows per page, page-turn animation) -->
+        <nav class="notebook-pager" id="txPager" aria-label="Transactions pages"></nav>
       <?php endif; ?>
     </div>
   </main>
@@ -212,5 +218,6 @@ $topbarSubtitle = 'Manage and track all your transactions.';
 <script src="assets/js/ui-modals.js"></script>
 <script>window.PESO_BUDGET_SNAPSHOT = <?php echo json_encode($budgetSnapshot); ?>;</script>
 <script src="assets/js/expense-modal.js"></script>
+<script src="assets/js/expenses-pager.js"></script>
 </body>
 </html>

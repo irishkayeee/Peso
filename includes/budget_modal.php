@@ -21,16 +21,14 @@
           <input type="hidden" name="period_start" value="<?php echo htmlspecialchars($periodStart ?? ''); ?>">
           <input type="hidden" name="period_end" value="<?php echo htmlspecialchars($periodEnd ?? ''); ?>">
 
+          <!-- Category comes from the clicked card/button (data-category); not user-editable here -->
+          <input type="hidden" id="budgetCategory" name="category" value="">
+
           <div class="mb-3">
-            <label class="form-label" for="budgetCategory">Applies To</label>
+            <label class="form-label" for="budgetCategoryLabel">Applies To</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-tag"></i></span>
-              <select class="form-control" id="budgetCategory" name="category">
-                <option value="">Overall Budget</option>
-                <?php foreach ($CATEGORIES as $cat): ?>
-                  <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></option>
-                <?php endforeach; ?>
-              </select>
+              <input type="text" class="form-control" id="budgetCategoryLabel" value="Overall Budget" readonly tabindex="-1">
             </div>
           </div>
 
@@ -38,7 +36,7 @@
             <label class="form-label" for="budgetAmount">Budget Amount</label>
             <div class="input-group">
               <span class="input-group-text">&#8369;</span>
-              <input type="number" step="0.01" min="0.01" class="form-control" id="budgetAmount" name="amount" placeholder="0.00" required>
+              <input type="number" step="0.01" min="0.01" max="<?php echo PESO_MAX_BUDGET; ?>" class="form-control" id="budgetAmount" name="amount" placeholder="0.00" required>
             </div>
           </div>
 

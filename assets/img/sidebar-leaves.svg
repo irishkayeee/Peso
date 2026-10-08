@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 220">
+  <!-- Soft wave along the bottom -->
+  <path d="M0 150 C70 205 150 200 260 160 L260 220 L0 220 Z" fill="#ffffff" fill-opacity="0.04"/>
+  <path d="M60 220 C120 180 190 170 260 175" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1.2"/>
+
+  <!-- Leaf sprig, bottom-left -->
+  <g fill="#7FAF9B">
+    <path d="M10 70 C40 90 62 140 70 200 C40 170 18 125 10 70 Z" fill-opacity="0.18"/>
+    <path d="M70 200 C80 170 105 150 140 145 C125 175 100 195 70 200 Z" fill-opacity="0.22"/>
+    <path d="M0 120 C25 130 45 160 50 205 C25 185 8 155 0 120 Z" fill-opacity="0.12"/>
+  </g>
+  <path d="M70 200 C55 160 35 115 12 75" fill="none" stroke="#7FAF9B" stroke-opacity="0.25" stroke-width="1.2"/>
+</svg>

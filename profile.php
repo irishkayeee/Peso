@@ -62,9 +62,31 @@ $topbarSubtitle = 'Manage your account information and preferences.';
     font-size: 0.75rem; cursor: pointer; padding: 0;
   }
   .profile-avatar-edit-btn:hover { background-color: var(--forest-green-dark, var(--forest-green)); }
+
+  /* Avatar picker modal */
+  .avatar-modal-content { border: none; border-radius: 20px; padding: 0.5rem; }
+  .avatar-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.6rem; }
+  .avatar-option {
+    display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+    padding: 0.5rem 0.25rem; border: 2px solid transparent; border-radius: 16px;
+    background: none; font-size: 0.72rem; font-weight: 600; color: var(--charcoal); white-space: nowrap;
+    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .avatar-option img { width: 100%; max-width: 64px; aspect-ratio: 1; border-radius: 50%; }
+  .avatar-option:hover { transform: translateY(-3px); background-color: rgba(127, 175, 155, 0.1); }
+  .avatar-option.is-selected { border-color: var(--forest-green); background-color: rgba(127, 175, 155, 0.14); color: var(--forest-green); }
+  .avatar-option:disabled { opacity: 0.6; }
+  .avatar-upload-divider { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; color: rgba(38, 51, 46, 0.45); font-size: 0.8rem; }
+  .avatar-upload-divider::before, .avatar-upload-divider::after { content: ""; flex: 1; height: 1px; background-color: rgba(38, 51, 46, 0.12); }
+  @media (max-width: 420px) { .avatar-options { grid-template-columns: repeat(3, 1fr); } }
   .toggle-switch { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
   .form-switch .form-check-input { width: 2.6em; height: 1.4em; cursor: pointer; }
   .form-switch .form-check-input:checked { background-color: var(--forest-green); border-color: var(--forest-green); }
+  @media (min-width: 992px) {
+    /* Center the two cards in the space below the topbar */
+    .profile-main { display: flex; flex-direction: column; min-height: 100vh; }
+    .profile-row { margin-top: auto; margin-bottom: auto; padding-bottom: 1.6rem; }
+  }
 </style>
 </head>
 <body class="dash-body">
@@ -72,13 +94,13 @@ $topbarSubtitle = 'Manage your account information and preferences.';
 <div class="dash-wrapper">
   <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
-  <main class="dash-main">
+  <main class="dash-main profile-main">
     <?php include __DIR__ . '/includes/topbar.php'; ?>
 
-    <div class="row g-3">
-      <div class="col-12">
-        <div class="dash-card mb-3">
-          <div class="d-flex align-items-center gap-3 mb-4">
+    <div class="row g-3 profile-row">
+      <div class="col-lg-6">
+        <div class="dash-card h-100">
+          <div class="d-flex flex-column align-items-center text-center gap-2 mb-4">
             <div class="profile-avatar-picker" id="avatarPicker">
               <?php if (!empty($user['profile_picture'])): ?>
                 <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>?v=<?php echo time(); ?>" alt="Profile picture" class="profile-avatar-lg" id="avatarImg">
@@ -102,11 +124,26 @@ $topbarSubtitle = 'Manage your account information and preferences.';
           <div class="auth-alert auth-alert-danger mb-3" id="profileError" hidden></div>
 
           <form class="auth-form" id="profileForm" novalidate>
-            <div class="mb-3">
-              <label class="form-label" for="profileFullName">Full Name</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-person"></i></span>
-                <input type="text" class="form-control" id="profileFullName" name="full_name" value="<?php echo htmlspecialchars($user['full_name']); ?>" required>
+            <?php
+              // Stored as one full_name; last word is treated as the last name.
+              $nameParts = preg_split('/\s+/', trim($user['full_name']));
+              $lastName = count($nameParts) > 1 ? array_pop($nameParts) : '';
+              $firstName = implode(' ', $nameParts);
+            ?>
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6">
+                <label class="form-label" for="profileFirstName">First Name</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" id="profileFirstName" name="first_name" value="<?php echo htmlspecialchars($firstName); ?>" maxlength="50" required>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="profileLastName">Last Name</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" id="profileLastName" name="last_name" value="<?php echo htmlspecialchars($lastName); ?>" maxlength="50" required>
+                </div>
               </div>
             </div>
 
@@ -118,13 +155,13 @@ $topbarSubtitle = 'Manage your account information and preferences.';
               </div>
             </div>
 
-            <button type="submit" class="btn-forest-block" id="profileSubmitBtn" style="width:auto; padding-left:1.8rem; padding-right:1.8rem;">Save Changes</button>
+            <button type="submit" class="btn-forest-block" id="profileSubmitBtn" style="width:auto; padding:0.5rem 1.25rem; font-size:0.875rem;">Save Changes</button>
           </form>
         </div>
       </div>
 
-      <div class="col-12">
-        <div class="dash-card mb-3">
+      <div class="col-lg-6">
+        <div class="dash-card h-100">
           <h2 class="mb-3" style="font-size:1rem; font-weight:700; color:var(--charcoal);">Change Password</h2>
 
           <div class="auth-alert auth-alert-danger mb-3" id="passwordError" hidden></div>
@@ -146,6 +183,16 @@ $topbarSubtitle = 'Manage your account information and preferences.';
                 <input type="password" class="form-control" id="newPassword" name="new_password" minlength="8" required>
                 <button class="toggle-password input-group-text" type="button" data-target="newPassword"><i class="bi bi-eye"></i></button>
               </div>
+              <div class="password-strength">
+                <div class="password-strength-bar" data-strength-for="newPassword"></div>
+              </div>
+              <ul class="password-rules" data-rules-for="newPassword">
+                <li data-rule="length"><i class="bi bi-circle"></i> At least 8 characters</li>
+                <li data-rule="upper"><i class="bi bi-circle"></i> An uppercase letter (A–Z)</li>
+                <li data-rule="lower"><i class="bi bi-circle"></i> A lowercase letter (a–z)</li>
+                <li data-rule="number"><i class="bi bi-circle"></i> A number (0–9)</li>
+                <li data-rule="special"><i class="bi bi-circle"></i> A special character (!@#$)</li>
+              </ul>
             </div>
 
             <div class="mb-4">
@@ -157,12 +204,42 @@ $topbarSubtitle = 'Manage your account information and preferences.';
               </div>
             </div>
 
-            <button type="submit" class="btn-forest-block" id="passwordSubmitBtn" style="width:auto; padding-left:1.8rem; padding-right:1.8rem;">Update Password</button>
+            <button type="submit" class="btn-forest-block" id="passwordSubmitBtn" style="width:auto; padding:0.5rem 1.25rem; font-size:0.875rem;">Update Password</button>
           </form>
         </div>
       </div>
     </div>
   </main>
+</div>
+
+<!-- Avatar picker -->
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-labelledby="avatarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content avatar-modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="avatarModalLabel" style="color:var(--forest-green);">Choose your avatar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">Pick a money buddy, or upload your own photo.</p>
+        <div class="avatar-options">
+          <?php foreach (['piggy' => 'Piggy Bank', 'coin' => 'Piso Coin', 'wallet' => 'Wallet', 'moneybag' => 'Money Bag', 'sprout' => 'Money Plant'] as $key => $label):
+            $path = 'assets/img/avatars/' . $key . '.svg';
+          ?>
+            <button type="button" class="avatar-option <?php echo ($user['profile_picture'] ?? '') === $path ? 'is-selected' : ''; ?>" data-avatar="<?php echo $key; ?>" aria-label="<?php echo $label; ?>">
+              <img src="<?php echo $path; ?>" alt="">
+              <span><?php echo $label; ?></span>
+            </button>
+          <?php endforeach; ?>
+        </div>
+        <div class="auth-alert auth-alert-danger mt-3 mb-0 py-1 px-2" id="avatarModalError" hidden style="font-size:0.8rem;"></div>
+        <div class="avatar-upload-divider"><span>or</span></div>
+        <button type="button" class="btn btn-outline-forest w-100" id="avatarUploadBtn">
+          <i class="bi bi-upload me-1"></i> Upload your own photo
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <?php include __DIR__ . '/includes/ui_modals.php'; ?>

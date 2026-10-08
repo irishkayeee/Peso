@@ -1,6 +1,6 @@
 <?php
 /**
- * PESO - Update profile information (full name, email)
+ * PESO - Update profile information (first + last name, email)
  */
 session_start();
 header('Content-Type: application/json');
@@ -13,13 +13,22 @@ if (empty($_SESSION['user_id'])) {
 }
 
 $userId = (int) $_SESSION['user_id'];
-$fullName = trim($_POST['full_name'] ?? '');
+$firstName = trim(preg_replace('/\s+/', ' ', $_POST['first_name'] ?? ''));
+$lastName = trim(preg_replace('/\s+/', ' ', $_POST['last_name'] ?? ''));
 $email = trim($_POST['email'] ?? '');
 
-if ($fullName === '') {
-    echo json_encode(['success' => false, 'message' => 'Please enter your full name.']);
+if ($firstName === '') {
+    echo json_encode(['success' => false, 'message' => 'Please enter your first name.']);
     exit;
 }
+
+if ($lastName === '') {
+    echo json_encode(['success' => false, 'message' => 'Please enter your last name.']);
+    exit;
+}
+
+// Still stored as a single full_name column.
+$fullName = $firstName . ' ' . $lastName;
 
 $emailError = peso_validate_real_email($email);
 if ($emailError !== null) {

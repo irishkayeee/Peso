@@ -33,6 +33,14 @@ function peso_send_mail(string $to, string $subject, string $bodyHtml, ?string $
         $mail->Username = MAIL_USERNAME;
         $mail->Password = MAIL_PASSWORD;
         $mail->SMTPSecure = MAIL_ENCRYPTION === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'cafile' => MAIL_CA_FILE,
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+                'allow_self_signed' => false,
+            ],
+        ];
         $mail->CharSet = 'UTF-8';
 
         $mail->setFrom(MAIL_FROM_EMAIL !== '' ? MAIL_FROM_EMAIL : MAIL_USERNAME, MAIL_FROM_NAME);

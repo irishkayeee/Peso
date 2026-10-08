@@ -5,6 +5,9 @@
 
 const PESO_PERIOD_TYPES = ['day', 'week', 'month'];
 
+// Highest amount allowed for a single budget (overall or per-category).
+const PESO_MAX_BUDGET = 1000000;
+
 /**
  * Resolve a period type into a concrete [start, end] date range (Y-m-d).
  * Day/Week/Month are always "current" (today / this week / this month) -

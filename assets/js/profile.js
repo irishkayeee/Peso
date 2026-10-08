@@ -44,10 +44,83 @@ document.addEventListener('DOMContentLoaded', function () {
   var avatarInput = document.getElementById('avatarInput');
   var avatarError = document.getElementById('avatarError');
 
-  if (avatarEditBtn && avatarInput) {
-    avatarEditBtn.addEventListener('click', function () {
-      avatarInput.click();
+  var avatarModalEl = document.getElementById('avatarModal');
+  var avatarModal = avatarModalEl ? bootstrap.Modal.getOrCreateInstance(avatarModalEl) : null;
+  var avatarModalError = document.getElementById('avatarModalError');
+
+  // Swap the new picture into the profile card and the sidebar
+  function applyAvatar(src) {
+    var profileImg = document.getElementById('avatarImg');
+    if (profileImg) {
+      var newImg = document.createElement('img');
+      newImg.src = src;
+      newImg.alt = 'Profile picture';
+      newImg.id = 'avatarImg';
+      newImg.className = 'profile-avatar-lg';
+      profileImg.replaceWith(newImg);
+    }
+
+    document.querySelectorAll('.dash-sidebar-user-avatar').forEach(function (el) {
+      el.innerHTML = '<img src="' + src + '" alt="">';
     });
+  }
+
+  function markSelectedAvatar(path) {
+    document.querySelectorAll('.avatar-option').forEach(function (btn) {
+      btn.classList.toggle('is-selected', 'assets/img/avatars/' + btn.getAttribute('data-avatar') + '.svg' === path);
+    });
+  }
+
+  if (avatarEditBtn && avatarModal) {
+    avatarEditBtn.addEventListener('click', function () {
+      if (avatarModalError) avatarModalError.hidden = true;
+      avatarModal.show();
+    });
+
+    document.querySelectorAll('.avatar-option').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var formData = new FormData();
+        formData.append('avatar', btn.getAttribute('data-avatar'));
+        if (avatarModalError) avatarModalError.hidden = true;
+        btn.disabled = true;
+
+        fetch('api/set_avatar.php', { method: 'POST', body: formData })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (!data.success) {
+              if (avatarModalError) {
+                avatarModalError.textContent = data.message || 'Could not update avatar.';
+                avatarModalError.hidden = false;
+              }
+              return;
+            }
+            applyAvatar(data.profile_picture);
+            markSelectedAvatar(data.profile_picture);
+            avatarModal.hide();
+            pesoSuccess(data.message || 'Avatar updated.', 'Looking Cute!');
+          })
+          .catch(function () {
+            if (avatarModalError) {
+              avatarModalError.textContent = 'Network error. Please try again.';
+              avatarModalError.hidden = false;
+            }
+          })
+          .finally(function () {
+            btn.disabled = false;
+          });
+      });
+    });
+
+    var avatarUploadBtn = document.getElementById('avatarUploadBtn');
+    if (avatarUploadBtn && avatarInput) {
+      avatarUploadBtn.addEventListener('click', function () {
+        avatarModal.hide();
+        avatarInput.click();
+      });
+    }
+  }
+
+  if (avatarInput) {
 
     avatarInput.addEventListener('change', function () {
       var file = avatarInput.files[0];
@@ -69,22 +142,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
           }
 
-          var src = data.profile_picture + '?v=' + Date.now();
-
-          var profileImg = document.getElementById('avatarImg');
-          if (profileImg) {
-            var newImg = document.createElement('img');
-            newImg.src = src;
-            newImg.alt = 'Profile picture';
-            newImg.id = 'avatarImg';
-            newImg.className = 'profile-avatar-lg';
-            profileImg.replaceWith(newImg);
-          }
-
-          var topbarAvatar = document.getElementById('topbarAvatar');
-          if (topbarAvatar) {
-            topbarAvatar.innerHTML = '<img src="' + src + '" alt="">';
-          }
+          applyAvatar(data.profile_picture + '?v=' + Date.now());
+          markSelectedAvatar(data.profile_picture);
 
           pesoSuccess(data.message || 'Profile picture updated.', 'Photo Updated!');
         })

@@ -58,7 +58,8 @@ $relativePath = 'assets/uploads/avatars/' . $fileName;
 
 $pdo->prepare('UPDATE users SET profile_picture = ? WHERE id = ?')->execute([$relativePath, $userId]);
 
-if ($oldPicture && $oldPicture !== $relativePath && is_file(__DIR__ . '/../' . $oldPicture)) {
+// Only delete the user's own old upload, never a shared preset avatar
+if ($oldPicture && $oldPicture !== $relativePath && strpos($oldPicture, 'assets/uploads/avatars/') === 0 && is_file(__DIR__ . '/../' . $oldPicture)) {
     unlink(__DIR__ . '/../' . $oldPicture);
 }
 

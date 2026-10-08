@@ -15,7 +15,7 @@ if (empty($_SESSION['user_id'])) {
 
 $userId = (int) $_SESSION['user_id'];
 $category = trim($_POST['category'] ?? '');
-$amount = (float) ($_POST['amount'] ?? 0);
+$amountRaw = trim($_POST['amount'] ?? '');
 $periodType = trim($_POST['period_type'] ?? 'month');
 
 if (!in_array($periodType, PESO_PERIOD_TYPES, true)) {
@@ -27,8 +27,21 @@ $range = peso_period_range($periodType);
 $periodStart = $range['start'];
 $periodEnd = $range['end'];
 
+// Plain number with up to 2 decimals only (rejects "1e9", "abc", "12.345", negatives).
+if ($amountRaw === '' || !preg_match('/^\d+(\.\d{1,2})?$/', $amountRaw)) {
+    echo json_encode(['success' => false, 'message' => 'Please enter a valid budget amount (up to 2 decimal places).']);
+    exit;
+}
+
+$amount = (float) $amountRaw;
+
 if ($amount <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Please enter a valid budget amount.']);
+    echo json_encode(['success' => false, 'message' => 'Budget amount must be greater than ₱0.00.']);
+    exit;
+}
+
+if ($amount > PESO_MAX_BUDGET) {
+    echo json_encode(['success' => false, 'message' => 'Budget amount can\'t be more than ₱' . number_format(PESO_MAX_BUDGET, 2) . '.']);
     exit;
 }
 

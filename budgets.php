@@ -104,68 +104,83 @@ $topbarSubtitle = 'Set spending limits and track how close you are to them.';
 <div class="dash-wrapper">
   <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
-  <main class="dash-main">
+  <main class="dash-main budgets-main">
     <?php include __DIR__ . '/includes/topbar.php'; ?>
 
-    <div class="dash-card mb-3">
-      <div class="period-tabs">
-        <a href="budgets.php?period=day&amp;day=<?php echo $selectedDay; ?>" class="period-tab <?php echo $periodType === 'day' ? 'active' : ''; ?>">Day</a>
-        <a href="budgets.php?period=week&amp;week=<?php echo $selectedWeekStart; ?>" class="period-tab <?php echo $periodType === 'week' ? 'active' : ''; ?>">Week</a>
-        <a href="budgets.php?period=month&amp;month=<?php echo $selectedMonth; ?>" class="period-tab <?php echo $periodType === 'month' ? 'active' : ''; ?>">Month</a>
+    <div class="period-tabs mb-3">
+      <a href="budgets.php?period=day&amp;day=<?php echo $selectedDay; ?>" class="period-tab <?php echo $periodType === 'day' ? 'active' : ''; ?>">Day</a>
+      <a href="budgets.php?period=week&amp;week=<?php echo $selectedWeekStart; ?>" class="period-tab <?php echo $periodType === 'week' ? 'active' : ''; ?>">Week</a>
+      <a href="budgets.php?period=month&amp;month=<?php echo $selectedMonth; ?>" class="period-tab <?php echo $periodType === 'month' ? 'active' : ''; ?>">Month</a>
+    </div>
+
+    <!-- Overall budget -->
+    <div class="dash-card budget-overall-card mb-3">
+      <div class="budget-overall">
+        <div class="budget-overall-title">
+          <div>
+            <h2>Overall <?php echo $periodTypeLabel; ?> Budget</h2>
+            <div class="budget-overall-period"><?php echo $periodLabel; ?></div>
+          </div>
+        </div>
+
+        <div class="budget-overall-body">
+          <?php if ($overallBudget <= 0): ?>
+            <div class="budget-overall-empty">
+              <i class="bi bi-bullseye"></i>
+              <?php echo $isPastPeriod
+                ? 'No overall budget was set for this period.'
+                : "You haven't set an overall budget for this period yet."; ?>
+            </div>
+          <?php else: ?>
+            <div class="budget-stats">
+              <div class="budget-stat">
+                <span class="budget-stat-icon"><i class="bi bi-wallet2"></i></span>
+                <div>
+                  <div class="budget-stat-label">Budget</div>
+                  <div class="budget-stat-value"><?php echo peso_format_currency($overallBudget); ?></div>
+                </div>
+              </div>
+              <div class="budget-stat">
+                <span class="budget-stat-icon"><i class="bi bi-credit-card-2-front"></i></span>
+                <div>
+                  <div class="budget-stat-label">Spent</div>
+                  <div class="budget-stat-value"><?php echo peso_format_currency($totalSpent); ?></div>
+                </div>
+              </div>
+              <div class="budget-stat">
+                <span class="budget-stat-icon gold"><i class="bi bi-database"></i></span>
+                <div>
+                  <div class="budget-stat-label">Remaining</div>
+                  <div class="budget-stat-value <?php echo $overallRemaining < 0 ? 'over' : 'gold'; ?>"><?php echo peso_format_currency($overallRemaining); ?></div>
+                </div>
+              </div>
+            </div>
+            <div class="summary-progress budget-overall-progress">
+              <div class="summary-progress-bar" style="width:<?php echo min($overallUsedPct, 100); ?>%; background-color:<?php echo peso_progress_color($overallUsedPct, $ALERT_THRESHOLD); ?>;"></div>
+            </div>
+            <div class="budget-overall-meta">
+              <?php echo number_format($overallUsedPct, 0); ?>% used &middot; alerts trigger at <?php echo $ALERT_THRESHOLD; ?>%
+              &middot; <?php echo peso_format_currency($categoryBudgetSum); ?> of <?php echo peso_format_currency($overallBudget); ?> allocated
+              &middot;
+              <span style="<?php echo $unallocated < 0 ? 'color:var(--muted-red);' : ''; ?>"><?php echo peso_format_currency(abs($unallocated)); ?> <?php echo $unallocated < 0 ? 'over-allocated' : 'unallocated'; ?></span>
+            </div>
+          <?php endif; ?>
+        </div>
+
+        <?php if (!$isPastPeriod): ?>
+          <div class="budget-overall-action">
+            <button type="button" class="btn btn-forest" data-bs-toggle="modal" data-bs-target="#budgetModal" data-category="" data-amount="<?php echo $overallBudget ?: ''; ?>">
+              <i class="bi bi-pencil me-1"></i> <?php echo $overallBudget > 0 ? 'Edit' : 'Set'; ?> Budget
+            </button>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
 
-    <div class="dash-card mb-3">
-      <!-- Overall budget -->
-      <div class="dash-card-header">
-        <h2>Overall <?php echo $periodTypeLabel; ?> Budget &mdash; <?php echo $periodLabel; ?></h2>
-        <?php if (!$isPastPeriod): ?>
-          <button type="button" class="btn btn-forest" data-bs-toggle="modal" data-bs-target="#budgetModal" data-category="" data-amount="<?php echo $overallBudget ?: ''; ?>">
-            <i class="bi bi-pencil me-1"></i> <?php echo $overallBudget > 0 ? 'Edit' : 'Set'; ?> Budget
-          </button>
-        <?php endif; ?>
-      </div>
-
-      <?php if ($overallBudget <= 0): ?>
-        <div class="empty-state">
-          <i class="bi bi-bullseye"></i>
-          <?php echo $isPastPeriod
-            ? 'No overall budget was set for this period.'
-            : "You haven't set an overall budget for this period yet."; ?>
-        </div>
-      <?php else: ?>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="summary-card-label">Budget</div>
-            <div class="summary-card-value"><?php echo peso_format_currency($overallBudget); ?></div>
-          </div>
-          <div class="col-md-4">
-            <div class="summary-card-label">Spent</div>
-            <div class="summary-card-value"><?php echo peso_format_currency($totalSpent); ?></div>
-          </div>
-          <div class="col-md-4">
-            <div class="summary-card-label">Remaining</div>
-            <div class="summary-card-value <?php echo $overallRemaining < 0 ? '' : 'gold'; ?>" style="<?php echo $overallRemaining < 0 ? 'color:var(--muted-red);' : ''; ?>">
-              <?php echo peso_format_currency($overallRemaining); ?>
-            </div>
-          </div>
-        </div>
-        <div class="summary-progress mt-3" style="height:8px;">
-          <div class="summary-progress-bar" style="width:<?php echo min($overallUsedPct, 100); ?>%; background-color:<?php echo peso_progress_color($overallUsedPct, $ALERT_THRESHOLD); ?>;"></div>
-        </div>
-        <div class="summary-trend neutral mt-2"><?php echo number_format($overallUsedPct, 0); ?>% used &middot; alerts trigger at <?php echo $ALERT_THRESHOLD; ?>%</div>
-        <div class="summary-trend neutral mt-1">
-          <?php echo peso_format_currency($categoryBudgetSum); ?> of <?php echo peso_format_currency($overallBudget); ?> allocated
-          &middot;
-          <span style="<?php echo $unallocated < 0 ? 'color:var(--muted-red);' : ''; ?>"><?php echo peso_format_currency(abs($unallocated)); ?> <?php echo $unallocated < 0 ? 'over-allocated' : 'unallocated'; ?></span>
-        </div>
-      <?php endif; ?>
-
-      <hr class="my-4" style="border-color:rgba(127, 175, 155, 0.25);">
-
+    <div class="dash-card budget-categories-card">
       <!-- Category budgets -->
       <div class="dash-card-header">
-        <h2 style="color:var(--forest-green);">Category Budgets</h2>
+        <h2><span class="dash-card-icon"><i class="bi bi-grid"></i></span>Category Budgets</h2>
       </div>
 
       <div class="row g-3">
@@ -182,15 +197,15 @@ $topbarSubtitle = 'Set spending limits and track how close you are to them.';
               $isNearBudget = $budget > 0 && !$isOverBudget && $pct >= $ALERT_THRESHOLD;
               $catCardClass = $isOverBudget ? 'is-over-budget' : ($isNearBudget ? 'is-near-budget' : '');
             ?>
-            <div class="budget-cat-card h-100 js-card-link <?php echo $catCardClass; ?>" data-href="expenses.php?category=<?php echo urlencode($cat); ?>&amp;date_from=<?php echo urlencode($periodStart); ?>&amp;date_to=<?php echo urlencode($periodEnd); ?>&amp;period_type=<?php echo urlencode($periodType); ?>" title="View <?php echo htmlspecialchars($cat); ?> transactions for this period">
+            <div class="budget-cat-card h-100 js-card-link <?php echo $catCardClass; ?>" style="--cat-color:<?php echo peso_category_color($cat); ?>; --cat-bg:<?php echo peso_category_pastel($cat); ?>;" data-href="expenses.php?category=<?php echo urlencode($cat); ?>&amp;date_from=<?php echo urlencode($periodStart); ?>&amp;date_to=<?php echo urlencode($periodEnd); ?>&amp;period_type=<?php echo urlencode($periodType); ?>" title="View <?php echo htmlspecialchars($cat); ?> transactions for this period">
               <div class="budget-cat-card-header">
                 <span class="budget-cat-name">
-                  <span class="budget-cat-icon" style="background-color:<?php echo peso_category_color($cat); ?>;">
+                  <span class="budget-cat-icon">
                     <i class="bi <?php echo peso_category_icon($cat); ?>"></i>
                   </span>
                   <?php echo htmlspecialchars($cat); ?>
                 </span>
-                <span class="d-flex align-items-center gap-2">
+                <span class="budget-cat-actions d-flex align-items-center gap-2">
                   <?php if ($isOverBudget): ?>
                     <span class="budget-alert-icon danger" title="Over budget"><i class="bi bi-exclamation-triangle-fill"></i></span>
                   <?php elseif ($isNearBudget): ?>
@@ -223,7 +238,7 @@ $topbarSubtitle = 'Set spending limits and track how close you are to them.';
                   <span style="<?php echo $remaining < 0 ? 'color:var(--muted-red);' : ''; ?>"><?php echo peso_format_currency($remaining); ?> left</span>
                 </div>
               <?php else: ?>
-                <p class="text-muted small mb-0">No budget set for this period.</p>
+                <p class="budget-cat-empty">No budget set for this period.</p>
                 <?php if ($spent > 0): ?>
                   <p class="text-muted small mb-0 mt-1">Spent so far: <?php echo peso_format_currency($spent); ?></p>
                 <?php endif; ?>
