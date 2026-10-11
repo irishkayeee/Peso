@@ -12,6 +12,12 @@ $authErrors = $_SESSION['auth_errors'] ?? [];
 $authOld = $_SESSION['auth_old'] ?? [];
 $authSuccess = $_SESSION['auth_success'] ?? null;
 unset($_SESSION['auth_modal'], $_SESSION['auth_errors'], $_SESSION['auth_old'], $_SESSION['auth_success']);
+$authLockoutUntil = (int) ($_SESSION['auth_lockout_until'] ?? 0);
+$loginLocked = $authLockoutUntil > time();
+$lockoutRemaining = $loginLocked ? min(300, $authLockoutUntil - time()) : 0;
+$lockoutProgress = $loginLocked ? (int) round($lockoutRemaining / 300 * 100) : 0;
+$lockoutMinutes = (int) floor($lockoutRemaining / 60);
+$lockoutSeconds = $lockoutRemaining % 60;
 
 $oldEmail = htmlspecialchars($authOld['email'] ?? '');
 $oldFirstName = htmlspecialchars($authOld['first_name'] ?? '');
@@ -330,7 +336,14 @@ if ($authModal === 'register' && !empty($authErrors)) {
           </div>
         <?php endif; ?>
 
-        <?php if ($authModal === 'login' && !empty($authErrors)): ?>
+        <?php if ($loginLocked): ?>
+          <div class="auth-alert auth-alert-danger login-lockout mb-3" id="loginLockoutTimer" data-until="<?php echo $authLockoutUntil; ?>" role="status" aria-live="polite">
+            <div class="login-lockout-message">Too many failed attempts. Try again in <strong id="loginLockoutCountdown"><?php echo sprintf('%d:%02d', $lockoutMinutes, $lockoutSeconds); ?></strong></div>
+            <div class="login-lockout-track" aria-hidden="true">
+              <div class="login-lockout-progress" id="loginLockoutProgress" style="width: <?php echo $lockoutProgress; ?>%"></div>
+            </div>
+          </div>
+        <?php elseif ($authModal === 'login' && !empty($authErrors)): ?>
           <div class="auth-alert auth-alert-danger mb-3">
             <ul class="mb-0 ps-3">
               <?php foreach ($authErrors as $error): ?>
@@ -353,8 +366,8 @@ if ($authModal === 'register' && !empty($authErrors)) {
             <label class="form-label" for="loginPassword">Password</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-lock"></i></span>
-              <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required>
-              <button class="toggle-password input-group-text" type="button" data-target="loginPassword">
+              <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required<?php echo $loginLocked ? ' disabled' : ''; ?>>
+              <button class="toggle-password input-group-text" type="button" data-target="loginPassword"<?php echo $loginLocked ? ' disabled' : ''; ?>>
                 <i class="bi bi-eye"></i>
               </button>
             </div>
@@ -364,7 +377,7 @@ if ($authModal === 'register' && !empty($authErrors)) {
             <a href="#" class="auth-forgot-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">Forgot password?</a>
           </div>
 
-          <button type="submit" class="btn-forest-block" id="loginSubmitBtn">Log In</button>
+          <button type="submit" class="btn-forest-block" id="loginSubmitBtn"<?php echo $loginLocked ? ' disabled' : ''; ?>>Log In</button>
         </form>
 
         <div class="auth-divider">or</div>
@@ -559,7 +572,7 @@ if ($authModal === 'register' && !empty($authErrors)) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/loading.js"></script>
 <script src="assets/js/main.js"></script>
-<script src="assets/js/auth.js"></script>
+<script src="assets/js/auth.js?v=<?php echo filemtime(__DIR__ . '/assets/js/auth.js'); ?>"></script>
 <script src="assets/js/forgot-password.js"></script>
 
 <?php if ($authModal === 'login' || $authModal === 'register'): ?>

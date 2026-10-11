@@ -118,6 +118,17 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
+-- Table structure for table `login_attempts`
+--
+
+CREATE TABLE `login_attempts` (
+  `email_hash` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `failed_attempts` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `locked_until` datetime DEFAULT NULL,
+  PRIMARY KEY (`email_hash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
 -- Dumping data for table `users`
 --
 

@@ -1,10 +1,50 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+  var lockoutTimer = document.getElementById('loginLockoutTimer');
+  if (lockoutTimer) {
+    var lockoutUntil = Number(lockoutTimer.getAttribute('data-until')) * 1000;
+    var lockoutCountdown = document.getElementById('loginLockoutCountdown');
+    var lockoutProgress = document.getElementById('loginLockoutProgress');
+    var loginPasswordInput = document.getElementById('loginPassword');
+    var loginPasswordToggle = document.querySelector('.toggle-password[data-target="loginPassword"]');
+    var lockoutSubmitBtn = document.getElementById('loginSubmitBtn');
+
+    function updateLockoutCountdown() {
+      var remainingSeconds = Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
+      if (remainingSeconds === 0) {
+        lockoutCountdown.textContent = '0:00';
+        if (lockoutProgress) lockoutProgress.style.width = '0%';
+        if (loginPasswordInput) loginPasswordInput.disabled = false;
+        if (loginPasswordToggle) loginPasswordToggle.disabled = false;
+        if (lockoutSubmitBtn) lockoutSubmitBtn.disabled = false;
+        return false;
+      }
+
+      var minutes = Math.floor(remainingSeconds / 60);
+      var seconds = remainingSeconds % 60;
+      lockoutCountdown.textContent = minutes + ':' + String(seconds).padStart(2, '0');
+      if (lockoutProgress) {
+        lockoutProgress.style.width = Math.min(100, remainingSeconds / 300 * 100) + '%';
+      }
+      return true;
+    }
+
+    if (updateLockoutCountdown()) {
+      var lockoutInterval = window.setInterval(function () {
+        if (!updateLockoutCountdown()) window.clearInterval(lockoutInterval);
+      }, 1000);
+    }
+  }
+
   // Show a coin loading state on the submit button while the auth form posts
   var loginSubmitBtn = document.getElementById('loginSubmitBtn');
   var loginForm = loginSubmitBtn ? loginSubmitBtn.closest('form') : null;
   if (loginForm) {
-    loginForm.addEventListener('submit', function () {
+    loginForm.addEventListener('submit', function (event) {
+      if (loginSubmitBtn.disabled) {
+        event.preventDefault();
+        return;
+      }
       pesoButtonLoading(loginSubmitBtn, true, 'Logging in...');
     });
   }

@@ -28,28 +28,87 @@ if ($email === '' && $password === '') {
 } elseif ($password === '') {
     $errors[] = 'Please enter your password.';
 } else {
-    $stmt = $pdo->prepare('SELECT id, full_name, password, has_seen_tour FROM users WHERE email = ?');
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
+    $emailHash = hash('sha256', strtolower($email));
+    $pdo->beginTransaction();
 
-    if ($user && password_verify($password, $user['password'])) {
-        session_regenerate_id(true);
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['full_name'] = $user['full_name'];
-        $_SESSION['just_logged_in'] = true;
+    try {
+        $pdo->prepare(
+            'INSERT IGNORE INTO login_attempts (email_hash, failed_attempts, locked_until)
+             VALUES (?, 0, NULL)'
+        )->execute([$emailHash]);
 
-        // First login after signup: show the "Welcome to PESO" dialog and the
-        // guided tour once, then remember it so later logins skip it.
-        if (empty($user['has_seen_tour'])) {
-            $_SESSION['first_login'] = true;
-            $pdo->prepare('UPDATE users SET has_seen_tour = 1 WHERE id = ?')->execute([$user['id']]);
+        $attemptStmt = $pdo->prepare(
+            'SELECT failed_attempts,
+                    locked_until IS NOT NULL AND locked_until > NOW() AS is_locked,
+                    GREATEST(0, TIMESTAMPDIFF(SECOND, NOW(), locked_until)) AS cooldown_seconds
+             FROM login_attempts
+             WHERE email_hash = ?
+             FOR UPDATE'
+        );
+        $attemptStmt->execute([$emailHash]);
+        $attempt = $attemptStmt->fetch();
+
+        if ($attempt['is_locked']) {
+            $pdo->commit();
+            $_SESSION['auth_lockout_until'] = time() + (int) $attempt['cooldown_seconds'];
+        } else {
+            unset($_SESSION['auth_lockout_until']);
+            $failedAttempts = (int) $attempt['failed_attempts'];
+            if ($failedAttempts >= 5) {
+                $failedAttempts = 0;
+                $pdo->prepare(
+                    'UPDATE login_attempts SET failed_attempts = 0, locked_until = NULL WHERE email_hash = ?'
+                )->execute([$emailHash]);
+            }
+
+            $stmt = $pdo->prepare('SELECT id, full_name, password, has_seen_tour FROM users WHERE email = ?');
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            if ($user && password_verify($password, $user['password'])) {
+                $pdo->prepare('DELETE FROM login_attempts WHERE email_hash = ?')->execute([$emailHash]);
+                $firstLogin = empty($user['has_seen_tour']);
+                if ($firstLogin) {
+                    $pdo->prepare('UPDATE users SET has_seen_tour = 1 WHERE id = ?')->execute([$user['id']]);
+                }
+                $pdo->commit();
+
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['just_logged_in'] = true;
+
+                // First login after signup: show the "Welcome to PESO" dialog and the
+                // guided tour once, then remember it so later logins skip it.
+                if ($firstLogin) {
+                    $_SESSION['first_login'] = true;
+                }
+
+                header('Location: dashboard.php');
+                exit;
+            }
+
+            $failedAttempts++;
+            $updateSql = $failedAttempts >= 5
+                ? 'UPDATE login_attempts SET failed_attempts = ?, locked_until = DATE_ADD(NOW(), INTERVAL 5 MINUTE) WHERE email_hash = ?'
+                : 'UPDATE login_attempts SET failed_attempts = ?, locked_until = NULL WHERE email_hash = ?';
+            $updateStmt = $pdo->prepare($updateSql);
+            $updateStmt->execute([$failedAttempts, $emailHash]);
+            $pdo->commit();
+
+            if ($failedAttempts >= 5) {
+                $_SESSION['auth_lockout_until'] = time() + 300;
+            } else {
+                $attemptsRemaining = 5 - $failedAttempts;
+                $errors[] = "Incorrect email or password. {$attemptsRemaining} attempt(s) remaining before a 5-minute cooldown.";
+            }
         }
-
-        header('Location: dashboard.php');
-        exit;
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
     }
-
-    $errors[] = 'Incorrect email or password.';
 }
 
 $_SESSION['auth_modal'] = 'login';
