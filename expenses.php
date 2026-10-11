@@ -106,7 +106,7 @@ $topbarSubtitle = 'Manage and track all your transactions.';
           <input type="text" class="dash-select" name="search" placeholder="Search description or category..." value="<?php echo htmlspecialchars($search); ?>">
         </div>
 
-        <select class="dash-select js-pretty-select" name="category" onchange="this.form.submit()">
+        <select class="dash-select js-pretty-select" name="category" data-auto-submit="true">
           <option value="">All Categories</option>
           <?php foreach ($CATEGORIES as $cat): ?>
             <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $categoryFilter === $cat ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat); ?></option>

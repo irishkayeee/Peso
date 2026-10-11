@@ -88,6 +88,9 @@ document.addEventListener('DOMContentLoaded', function () {
       select.selectedIndex = i;
       render();
       select.dispatchEvent(new Event('change', { bubbles: true }));
+      if (select.form && select.dataset.autoSubmit === 'true') {
+        select.form.submit();
+      }
     }
 
     trigger.addEventListener('click', function () {
